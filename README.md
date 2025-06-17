@@ -1,7 +1,7 @@
 🧮 Mental Math Trainer Pro
 A free, offline, customizable mental math trainer designed for speed, accuracy, and user control — built especially for Windows users who want a clean and focused tool.
 
-🔗 Try it now: mathtrainerpro.github.io/MentalMathTrainerPro
+🔗 Try Without Install: [Site](mathtrainerpro.github.io/MentalMathTrainerPro)
 
 ⬇️ **Download the App**: [GitHub Releases](https://github.com/MathTrainerPro/MentalMathTrainerPro/releases)
 
