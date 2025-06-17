@@ -29,7 +29,7 @@ Most mental math apps are either mobile-only, non-customizable, or cluttered wit
 
 ---
 
-## 📷 Screenshot
+## 📷 Demo
 
 ![Screenshot of the app](preview1.gif)
 
