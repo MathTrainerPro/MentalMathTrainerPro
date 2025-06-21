@@ -37,8 +37,12 @@
             display: none;
         }
 
+        /* Updated: Set active screens to flex by default for consistent layout */
         .screen.active {
-            display: block;
+            display: flex;
+            flex-direction: column; /* Most screens are column layout */
+            justify-content: center; /* Most screens are centered */
+            align-items: center; /* Most screens are centered */
             animation: fadeIn 0.5s ease;
         }
 
@@ -146,6 +150,8 @@
             text-align: left;
             border: 1px solid #333;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            width: 100%; /* Ensure settings group takes full width for flex display */
+            max-width: 600px; /* Limit width */
         }
 
         .settings-group h3 {
@@ -284,6 +290,8 @@
             justify-content: space-around;
             margin: 30px 0;
             flex-wrap: wrap;
+            width: 100%; /* Ensure stats take full width for flex display */
+            max-width: 600px; /* Limit width */
         }
 
         .stat-item {
@@ -396,6 +404,8 @@
             margin: 20px 0;
             flex-wrap: wrap;
             gap: 10px;
+            width: 100%; /* Ensure it takes full width */
+            max-width: 600px; /* Limit width */
         }
 
         .operation-stat {
@@ -427,6 +437,8 @@
             margin-top: 20px;
             border-top: 1px solid #444;
             padding-top: 20px;
+            width: 100%;
+            max-width: 600px;
         }
 
         .missed-problem-item {
@@ -478,6 +490,8 @@
             flex-direction: column;
             gap: 10px;
             align-items: center;
+            width: 100%;
+            max-width: 600px;
         }
 
         .footer-notice-content {
@@ -525,6 +539,38 @@
             background: rgba(138,43,226,1);
             transform: scale(1.1);
         }
+
+        /* Meme Break Screen Styles - Removed display:flex; here */
+        #memeBreakScreen {
+            gap: 20px;
+            padding: 20px;
+            min-height: 300px; /* Adjust as needed */
+        }
+
+        #memeBreakScreen h2 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+
+        #memeDisplay {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain; /* Ensures the entire image is visible within its container */
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transition: opacity 0.5s ease-in-out;
+            background-color: #000; /* Fallback for transparency */
+        }
+
+        #memeTimer {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff6b35;
+            text-shadow: 0 0 15px rgba(255,107,53,0.5);
+        }
+
 
         @media (max-width: 768px) {
             .container {
@@ -681,6 +727,17 @@
                     <input type="checkbox" id="hideQuestionTimer">
                     <label for="hideQuestionTimer">Hide question timer display</label>
                 </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="memeBreakEnabled">
+                    <label for="memeBreakEnabled">Every</label>
+                    <input type="number" id="memeBreakInterval" value="10" min="1" max="100">
+                    <label for="memeBreakInterval">problems allow a meme break for</label>
+                    <input type="number" id="memeBreakDuration" value="5" min="1" max="60">
+                    <label for="memeBreakDuration">seconds</label>
+                    <label for="memeBreakSlideshowSpeed">with a slideshow speed of</label>
+                    <input type="number" id="memeBreakSlideshowSpeed" value="2" min="1" max="30">
+                    <label for="memeBreakSlideshowSpeed">seconds</label>
+                </div>
             </div>
 
             <button class="btn" onclick="startPractice()">Begin Practice</button>
@@ -752,6 +809,12 @@
                 <button id="submitBtn" class="btn" onclick="submitAnswer()">Submit</button>
                 <button class="btn btn-secondary" onclick="endPractice()">End Practice</button>
             </div>
+        </div>
+
+        <div id="memeBreakScreen" class="screen">
+            <h2>Meme Break! 😂</h2>
+            <img id="memeDisplay" src="" alt="Meme">
+            <div id="memeTimer"></div>
         </div>
 
         <div id="resultsScreen" class="screen">
@@ -834,6 +897,23 @@
             mistakeThresholdAction: 'end',  // New: 'end' or 'restart'
             mistakeThresholdCount: 3,       // New: number of mistakes
             hideQuestionTimer: false, // New: Hide question timer display
+            
+            // New Meme Break State
+            memeBreakEnabled: false,
+            memeBreakInterval: 10,
+            memeBreakDuration: 5,
+            memeBreakSlideshowSpeed: 2, // New: Slideshow speed in seconds
+            problemsUntilMemeBreak: 0,
+            memeBreakTimer: null,
+            memeSlideshowInterval: null,
+            currentMemeIndex: 0,
+            memeImages: [
+                'meme/meme1.png',
+                'meme/meme2.png',
+                'meme/meme3.png',
+                // Add more meme image paths here (e.g., 'meme/another_meme.png')
+            ],
+
             currentProblem: null,
             correct: 0,
             incorrect: 0,
@@ -892,6 +972,14 @@
                 screen.classList.remove('active');
             });
             document.getElementById(screenId).classList.add('active');
+            // Re-apply styles needed for certain screens when they become active
+            if (screenId === 'startScreen') {
+                document.querySelector('#startScreen > h1').style.display = 'block'; // Example if start screen needed specific block display
+                document.querySelector('#startScreen > p').style.display = 'block';
+            } else {
+                 document.querySelector('#startScreen > h1').style.display = ''; // Reset display
+                 document.querySelector('#startScreen > p').style.display = '';
+            }
         }
 
         function showStart() {
@@ -915,6 +1003,12 @@
             document.getElementById('mistakeThresholdAction').value = gameState.mistakeThresholdAction;     // Update new preference
             document.getElementById('mistakeThresholdCount').value = gameState.mistakeThresholdCount;       // Update new preference
             document.getElementById('hideQuestionTimer').checked = gameState.hideQuestionTimer; // Update new preference
+            
+            // New Meme Break Settings
+            document.getElementById('memeBreakEnabled').checked = gameState.memeBreakEnabled;
+            document.getElementById('memeBreakInterval').value = gameState.memeBreakInterval;
+            document.getElementById('memeBreakDuration').value = gameState.memeBreakDuration;
+            document.getElementById('memeBreakSlideshowSpeed').value = gameState.memeBreakSlideshowSpeed; // New: Slideshow speed
 
             if (gameState.mode === 'timed') {
                 document.getElementById('timedMode').checked = true;
@@ -1190,7 +1284,13 @@
                 mistakeThresholdEnabled: document.getElementById('mistakeThresholdEnabled').checked,
                 mistakeThresholdAction: document.getElementById('mistakeThresholdAction').value,
                 mistakeThresholdCount: parseInt(document.getElementById('mistakeThresholdCount').value),
-                hideQuestionTimer: document.getElementById('hideQuestionTimer').checked // Save new preference
+                hideQuestionTimer: document.getElementById('hideQuestionTimer').checked,
+                
+                // Save new meme break settings
+                memeBreakEnabled: document.getElementById('memeBreakEnabled').checked,
+                memeBreakInterval: parseInt(document.getElementById('memeBreakInterval').value),
+                memeBreakDuration: parseInt(document.getElementById('memeBreakDuration').value),
+                memeBreakSlideshowSpeed: parseInt(document.getElementById('memeBreakSlideshowSpeed').value) // New: Save slideshow speed
             };
             localStorage.setItem('mathTrainerSettings', JSON.stringify(settings));
             // Removed: alert('Settings saved!');
@@ -1215,6 +1315,12 @@
                 gameState.mistakeThresholdAction = settings.mistakeThresholdAction || 'end';
                 gameState.mistakeThresholdCount = settings.mistakeThresholdCount !== undefined ? settings.mistakeThresholdCount : 3;
                 gameState.hideQuestionTimer = settings.hideQuestionTimer !== undefined ? settings.hideQuestionTimer : false; // Load new preference
+                
+                // Load new meme break settings
+                gameState.memeBreakEnabled = settings.memeBreakEnabled !== undefined ? settings.memeBreakEnabled : false;
+                gameState.memeBreakInterval = settings.memeBreakInterval !== undefined ? settings.memeBreakInterval : 10;
+                gameState.memeBreakDuration = settings.memeBreakDuration !== undefined ? settings.memeBreakDuration : 5;
+                gameState.memeBreakSlideshowSpeed = settings.memeBreakSlideshowSpeed !== undefined ? settings.memeBreakSlideshowSpeed : 2; // New: Load slideshow speed
 
                 // Update UI elements based on loaded settings
                 document.getElementById('minNumber').value = gameState.minNum;
@@ -1229,6 +1335,12 @@
                 document.getElementById('mistakeThresholdAction').value = gameState.mistakeThresholdAction;
                 document.getElementById('mistakeThresholdCount').value = gameState.mistakeThresholdCount;
                 document.getElementById('hideQuestionTimer').checked = gameState.hideQuestionTimer; // Update new preference
+                
+                // Update new meme break UI
+                document.getElementById('memeBreakEnabled').checked = gameState.memeBreakEnabled;
+                document.getElementById('memeBreakInterval').value = gameState.memeBreakInterval;
+                document.getElementById('memeBreakDuration').value = gameState.memeBreakDuration;
+                document.getElementById('memeBreakSlideshowSpeed').value = gameState.memeBreakSlideshowSpeed; // New: Update slideshow speed UI
 
                 if (gameState.mode === 'timed') {
                     document.getElementById('timedMode').checked = true;
@@ -1316,6 +1428,13 @@
             gameState.mistakeThresholdCount = parseInt(document.getElementById('mistakeThresholdCount').value); // Read new preference
             gameState.hideQuestionTimer = document.getElementById('hideQuestionTimer').checked; // Read new preference
             
+            // Read new meme break settings
+            gameState.memeBreakEnabled = document.getElementById('memeBreakEnabled').checked;
+            gameState.memeBreakInterval = parseInt(document.getElementById('memeBreakInterval').value);
+            gameState.memeBreakDuration = parseInt(document.getElementById('memeBreakDuration').value);
+            gameState.memeBreakSlideshowSpeed = parseInt(document.getElementById('memeBreakSlideshowSpeed').value); // New: Read slideshow speed
+
+
             // Validate settings
             if (gameState.minNum > gameState.maxNum) {
                 alert('Minimum number cannot be greater than maximum number!');
@@ -1331,6 +1450,12 @@
             }
             if (gameState.mistakeThresholdEnabled && (isNaN(gameState.mistakeThresholdCount) || gameState.mistakeThresholdCount <= 0)) {
                 alert('Please enter a valid mistake threshold (must be a positive number).');
+                return;
+            }
+            if (gameState.memeBreakEnabled && (isNaN(gameState.memeBreakInterval) || gameState.memeBreakInterval <= 0 || 
+                                              isNaN(gameState.memeBreakDuration) || gameState.memeBreakDuration <= 0 ||
+                                              isNaN(gameState.memeBreakSlideshowSpeed) || gameState.memeBreakSlideshowSpeed <= 0)) {
+                alert('Please enter valid positive numbers for Meme Break problems, duration, and slideshow speed.');
                 return;
             }
             
@@ -1350,6 +1475,9 @@
                 multiplication: { correct: 0, total: 0 },
                 division: { correct: 0, total: 0 }
             };
+            // Reset meme break counter for new session
+            gameState.problemsUntilMemeBreak = gameState.memeBreakEnabled ? gameState.memeBreakInterval : 0;
+
 
             // Set up timer/progress bar display based on mode
             if (gameState.mode === 'timed') {
@@ -1467,6 +1595,16 @@
             if (gameState.mode === 'quantity' && gameState.problemCount >= gameState.quantity) {
                 setTimeout(endPractice, 100); // Small delay to see feedback before ending
             } else {
+                // Check for meme break
+                if (gameState.memeBreakEnabled) {
+                    gameState.problemsUntilMemeBreak--;
+                    if (gameState.problemsUntilMemeBreak <= 0) {
+                        showMemeBreakScreen();
+                        gameState.problemsUntilMemeBreak = gameState.memeBreakInterval; // Reset counter
+                        return; // Stop further processing here
+                    }
+                }
+
                 setTimeout(() => {
                     answerInput.classList.remove('correct-answer', 'incorrect-answer'); // Remove styling after delay
                     generateProblem(); // Generate new problem after a short delay
@@ -1632,6 +1770,78 @@
             URL.revokeObjectURL(url); // Clean up the object URL
         }
 
+        // New Meme Break Functions
+        function loadMemeImages() {
+            // Preload images to prevent flickering
+            gameState.memeImages.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+            // Shuffle memes if you want them in random order
+            for (let i = gameState.memeImages.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [gameState.memeImages[i], gameState.memeImages[j]] = [gameState.memeImages[j], gameState.memeImages[i]];
+            }
+        }
+
+        function showMemeBreakScreen() {
+            showScreen('memeBreakScreen');
+            document.getElementById('answerInput').disabled = true; // Disable input during meme break
+            document.getElementById('submitBtn').disabled = true; // Disable submit button
+
+            if (gameState.timer) clearInterval(gameState.timer); // Pause main timer
+            if (gameState.questionTimer) clearInterval(gameState.questionTimer); // Pause question timer
+
+            const memeDisplay = document.getElementById('memeDisplay');
+            const memeTimerDisplay = document.getElementById('memeTimer');
+            let timeLeft = gameState.memeBreakDuration;
+            
+            gameState.currentMemeIndex = 0; // Start from the first meme
+            memeDisplay.src = gameState.memeImages[gameState.currentMemeIndex];
+            memeDisplay.style.opacity = 1; // Ensure it's visible
+
+            memeTimerDisplay.textContent = `${timeLeft}s`;
+
+            // Clear any existing slideshow interval before starting a new one
+            if (gameState.memeSlideshowInterval) {
+                clearInterval(gameState.memeSlideshowInterval);
+            }
+
+            gameState.memeSlideshowInterval = setInterval(() => {
+                gameState.currentMemeIndex = (gameState.currentMemeIndex + 1) % gameState.memeImages.length;
+                memeDisplay.style.opacity = 0; // Fade out current meme
+                setTimeout(() => {
+                    memeDisplay.src = gameState.memeImages[gameState.currentMemeIndex];
+                    memeDisplay.style.opacity = 1; // Fade in next meme
+                }, 500); // Match CSS transition duration for fade
+
+            }, gameState.memeBreakSlideshowSpeed * 1000); // Use the new slideshow speed
+
+            gameState.memeBreakTimer = setInterval(() => {
+                timeLeft--;
+                memeTimerDisplay.textContent = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    endMemeSlideshow();
+                }
+            }, 1000);
+        }
+
+        function endMemeSlideshow() {
+            clearInterval(gameState.memeBreakTimer);
+            clearInterval(gameState.memeSlideshowInterval); // Clear the slideshow interval
+            
+            document.getElementById('answerInput').disabled = false; // Re-enable input
+            document.getElementById('submitBtn').disabled = false; // Re-enable submit button
+
+            showScreen('practiceScreen'); // Return to practice screen
+            generateProblem(); // Generate next problem
+            
+            // Resume main timer if in timed mode
+            if (gameState.mode === 'timed') {
+                gameState.timer = setInterval(updateTimerDisplay, 1000);
+            }
+        }
+
 
         // Auto-enter functionality
         document.getElementById('answerInput').addEventListener('input', function() {
@@ -1693,6 +1903,7 @@
         // Initialize the app on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadSettings(); // Load settings when the page loads
+            loadMemeImages(); // Preload meme images
             showStart(); // This will call applyFooterNoticeState
             
             // Add event listener for the hide notice button (inside the notice)
