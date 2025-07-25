@@ -907,7 +907,11 @@ function startStopwatch() {
         if (trainingSettings.enableMaxResponseTime && !isProblemSubmitted) {
             const maxResponseTimeSeconds = trainingSettings.maxResponseTime ?? 3;
             if ((stopwatchMilliseconds / 1000) > maxResponseTimeSeconds) {
+                // Mark as incorrect due to timeout
                 checkAnswer(true);
+                // After marking incorrect, immediately move to the next problem
+                // This ensures it doesn't get stuck and the Enter key works for the next problem.
+                generateProblem(); 
             }
         }
     }, 10);
@@ -1201,7 +1205,10 @@ function checkAnswer(isTimedOut = false) {
         return;
     }
 
-    isProblemSubmitted = true;
+    // Only set isProblemSubmitted to true if it's a manual submission or a timeout that hasn't been handled yet
+    if (!isProblemSubmitted) {
+        isProblemSubmitted = true;
+    }
     stopStopwatch();
 
     const userAnswer = parseFloat(answerInput.value);
@@ -1241,7 +1248,7 @@ function checkAnswer(isTimedOut = false) {
     }
 
     if (!isCorrect && (trainingSettings.retryUntilCorrect ?? false)) {
-        isProblemSubmitted = false;
+        isProblemSubmitted = false; // Reset for retry
         answerInput.value = '';
         answerInput.focus();
         startStopwatch();
@@ -1269,8 +1276,11 @@ function checkAnswer(isTimedOut = false) {
         sessionEndedPrematurely = false;
         confirmEndSession();
     } else {
-        console.log('Generating next problem.');
-        generateProblem();
+        // Only generate next problem if it wasn't a timeout that already called generateProblem
+        if (!isTimedOut) {
+            console.log('Generating next problem.');
+            generateProblem();
+        }
     }
     updateProblemCountDisplay();
 }
