@@ -894,7 +894,7 @@ function startCountdown() {
 
 // Function to start the individual problem stopwatch
 function startStopwatch() {
-    clearInterval(stopwatchInterval);
+    clearInterval(stopwatchInterval); // Clear any existing stopwatch interval
     stopwatchMilliseconds = 0;
     updateStopwatchDisplay();
 
@@ -907,11 +907,10 @@ function startStopwatch() {
         if (trainingSettings.enableMaxResponseTime && !isProblemSubmitted) {
             const maxResponseTimeSeconds = trainingSettings.maxResponseTime ?? 3;
             if ((stopwatchMilliseconds / 1000) > maxResponseTimeSeconds) {
-                // Mark as incorrect due to timeout
-                checkAnswer(true);
-                // After marking incorrect, immediately move to the next problem
-                // This ensures it doesn't get stuck and the Enter key works for the next problem.
-                generateProblem(); 
+                // When timeout occurs, mark as incorrect and immediately stop this stopwatch
+                checkAnswer(true); // Mark as incorrect due to timeout
+                clearInterval(stopwatchInterval); // Stop the current stopwatch
+                return; // Exit this interval iteration
             }
         }
     }, 10);
@@ -1140,7 +1139,7 @@ function generateProblem() {
     feedbackMessage.style.visibility = 'hidden';
     answerInput.focus();
     updateProblemCountDisplay();
-    isProblemSubmitted = false;
+    isProblemSubmitted = false; // Reset this flag for the new problem
     startStopwatch();
 
     // Adjust problem display and speech based on presentation mode
@@ -1200,16 +1199,18 @@ function animateScore(element, start, end, duration = 300) {
 // Function to check the answer
 function checkAnswer(isTimedOut = false) {
     console.log('checkAnswer called. isTimedOut:', isTimedOut, 'isProblemSubmitted:', isProblemSubmitted);
+
+    // If already submitted and not a timeout, or if it's a timeout but already submitted, do nothing.
+    // This prevents double processing of the same problem.
     if (isProblemSubmitted && !isTimedOut) {
         console.log('Problem already submitted and not a timeout. Exiting checkAnswer.');
         return;
     }
 
-    // Only set isProblemSubmitted to true if it's a manual submission or a timeout that hasn't been handled yet
-    if (!isProblemSubmitted) {
-        isProblemSubmitted = true;
-    }
-    stopStopwatch();
+    // Mark problem as submitted for the current processing cycle.
+    // This must be done before any 'return' statements that prevent further processing.
+    isProblemSubmitted = true; 
+    stopStopwatch(); // Stop the stopwatch as an answer is being processed
 
     const userAnswer = parseFloat(answerInput.value);
     let isCorrect = false;
@@ -1247,18 +1248,20 @@ function checkAnswer(isTimedOut = false) {
         console.log('Answer Incorrect! Current incorrect score:', incorrectScore);
     }
 
+    // If incorrect and retryUntilCorrect is enabled, reset and allow retry for the SAME problem
     if (!isCorrect && (trainingSettings.retryUntilCorrect ?? false)) {
-        isProblemSubmitted = false; // Reset for retry
+        isProblemSubmitted = false; // Reset for retry on the same problem
         answerInput.value = '';
         answerInput.focus();
-        startStopwatch();
+        startStopwatch(); // Restart stopwatch for the retry attempt
         console.log('Answer incorrect and retryUntilCorrect is enabled. Resetting for retry.');
-        return;
+        return; // Do not advance to the next problem
     }
 
     problemSolvedCount++;
     console.log('Problem solved count:', problemSolvedCount);
 
+    // Check for failure conditions
     if (trainingSettings.enableFailureCondition && incorrectScore >= (trainingSettings.maxMistakes ?? 3)) {
         console.log('Failure condition met. Incorrect score:', incorrectScore, 'Max mistakes:', trainingSettings.maxMistakes);
         if (trainingSettings.failureAction === 'end') {
@@ -1266,21 +1269,20 @@ function checkAnswer(isTimedOut = false) {
             confirmEndSession();
         } else if (trainingSettings.failureAction === 'restart') {
             showTemporaryMessage(`Restarting session: Too many mistakes (${incorrectScore}).`);
-            startTrainingSession();
+            startTrainingSession(); // This will call generateProblem internally
         }
-        return;
+        return; // Session ended or restarted, do not generate next problem here
     }
 
+    // Check if fixed number of problems reached
     if (trainingSettings.practiceMode === 'fixed' && problemSolvedCount >= totalProblemsToSolve) {
         console.log('Fixed problems reached. Ending session.');
         sessionEndedPrematurely = false;
         confirmEndSession();
     } else {
-        // Only generate next problem if it wasn't a timeout that already called generateProblem
-        if (!isTimedOut) {
-            console.log('Generating next problem.');
-            generateProblem();
-        }
+        // If none of the above conditions led to an early exit, generate the next problem.
+        console.log('Generating next problem.');
+        generateProblem();
     }
     updateProblemCountDisplay();
 }
@@ -1674,7 +1676,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     endSessionBtn.addEventListener('click', requestEndSession);
     confirmEndBtn.addEventListener('click', confirmEndSession);
-    cancelEndBtn.addEventListener('click', cancelEndSession);
+    cancelEndBtn.addEventListener('click', cancelEndBtn);
 
     document.getElementById('testChimeBtn').addEventListener('click', async () => {
         if (Tone.context.state !== 'running') {
