@@ -1,47 +1,81 @@
 # 🧮 Mental Math Trainer Pro
-A free, offline, customizable mental math trainer designed for speed, accuracy, and user control — built especially for Windows users who want a clean and focused tool.
 
-🔗 **Try Without Installation**: [GitHub Hosted Site](https://mathtrainerpro.github.io/MentalMathTrainerPro/)
+*A free, offline, customizable mental math trainer designed for speed, accuracy, and user control — built especially for Windows users who want a clean and focused tool.*
 
+---
+
+🔗 **Try Without Installation**: [GitHub Hosted Site](https://mathtrainerpro.github.io/MentalMathTrainerPro/)  
 ⬇️ **Download the App**: [GitHub Releases](https://github.com/MathTrainerPro/MentalMathTrainerPro/releases)
 
 ---
 
 ## 💡 Why I Built This
 
-Most mental math apps are either mobile-only, non-customizable, or cluttered with ads and distractions.  
-**Mental Math Trainer Pro** was made for serious learners, teachers, and anyone wanting **pure arithmetic training** — fast, local, and clean.
+Most mental math tools today are:
+
+- App-only and limited on desktop
+- Filled with distractions or paywalls
+- Missing serious customization for learners and educators
+
+**Mental Math Trainer Pro** is my solution — a clean, fast, local-first math trainer with **full control**, designed to help users build accuracy, confidence, and speed in arithmetic without fluff.
 
 ---
 
-## 🎯 Features
+## 🎯 Features at a Glance
 
-- 🧠 Supports **Addition, Subtraction, Multiplication, Division**, and **Mixed Mode**
-- ⏱️ Choose **Timed Practice** or **Fixed Problem Quantity**
-- 🎯 Set **number ranges** for difficulty control
-- 🚫 Optional **mistake limits**, **question timers**, and **auto-submit**
-- ✅ **Success chime**, clean feedback visuals
-- 📈 Stats per operation, accuracy tracking
-- 📤 Export session results as `.txt`
-- 📝 View missed problems (with time limit reasons!)
-- 💾 Saves your settings with `localStorage`
-- 🧑‍🏫 [Hide] notice button
+- ➕ ➖ ✖️ ➗ **All Operations** — Including mixed-mode practice
+- 🕒 **Practice Modes** — Timed or Fixed problem sets
+- 🎚️ **Custom Ranges** — Control difficulty by setting number ranges
+- 🚨 **Mistake Limits** — Fail/Restart rules for discipline-based learning
+- 🔄 **Auto-Submit + Timeout** — Time-based pressure if desired
+- 🔊 **Audio Feedback** — Success chimes, error buzzers
+- 📊 **Live Stats** — Track accuracy and speed in real-time
+- 📁 **Export Session Data** — Save your results as `.txt`
+- 🧠 **Memory Modes** — Visual + audio-only training for mental retention
+- 🎨 **Full Theme Customization** — Change colors, backgrounds, and UI style
+- 💾 **No Account Needed** — All data saved locally via `localStorage`
 
 ---
 
-## 📷 Demo
+## 🖼️ Demo Preview
 
-![Screenshot of the app](preview1.gif)
+![App Demo](preview1.gif)
+
+---
+
+## 🛠 Tech Stack
+
+- **Vanilla JS + HTML/CSS**
+- [Tone.js](https://tonejs.github.io/) for sound feedback
+- [Chart.js](https://www.chartjs.org/) for real-time pie chart visuals
+- No frameworks or build tools — everything runs client-side.
+
+---
+
+## 🔐 Privacy & Philosophy
+
+- ❌ No ads  
+- ❌ No tracking  
+- ❌ No analytics  
+- ✅ Everything works **offline**  
+- ✅ Settings & history are stored **only on your machine**
+
+> This app was built for clarity, not profit.
 
 ---
 
 ## 📬 Contact
 
-Found a bug? Want to request a feature?  
-**Email**: `PotatoSlicer18@protonmail.com`
+Found a bug or want to suggest a feature?  
+📧 **Email**: `PotatoSlicer18@protonmail.com`
 
 ---
 
 ## 📄 License
 
-This project is open-source and free to use under the MIT License.
+MIT License — free to use, fork, modify, and share.  
+A credit is appreciated but not required.
+
+---
+
+> Built for learners. Designed for mastery. ✨
