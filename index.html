@@ -3,1913 +3,610 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mental Math Trainer Pro</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #e0e0e0;
-        }
-
-        .container {
-            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 20px rgba(138,43,226,0.1);
-            text-align: center;
-            max-width: 700px;
-            width: 90%;
-            transition: all 0.3s ease;
-            border: 1px solid #333;
-        }
-
-        .screen {
-            display: none;
-        }
-
-        /* Updated: Set active screens to flex by default for consistent layout */
-        .screen.active {
-            display: flex;
-            flex-direction: column; /* Most screens are column layout */
-            justify-content: center; /* Most screens are centered */
-            align-items: center; /* Most screens are centered */
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        h1 {
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 30px;
-            font-size: 2.5em;
-            font-weight: 200;
-            text-shadow: 0 0 10px rgba(255,107,53,0.3);
-        }
-
-        h2 {
-            color: #e0e0e0;
-            margin-bottom: 25px;
-            font-size: 1.8em;
-            font-weight: 300;
-        }
-
-        .btn {
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 25px;
-            font-size: 1.1em;
-            font-weight: 300;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin: 10px;
-            box-shadow: 0 5px 15px rgba(138,43,226,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
-            border: 1px solid rgba(138,43,226,0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(138,43,226,0.4), inset 0 1px 0 rgba(255,255,255,0.2);
-            background: linear-gradient(45deg, #8a2be2, #ff6b35);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-
-        .operation-selector {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin: 30px 0;
-            flex-wrap: wrap;
-        }
-
-        .operation-btn {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border: 2px solid #444;
-            border-radius: 15px;
-            padding: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 120px;
-            color: #e0e0e0;
-        }
-
-        .operation-btn:hover {
-            border-color: #8a2be2;
-            box-shadow: 0 0 15px rgba(138,43,226,0.3);
-        }
-
-        .operation-btn.selected {
-            border-color: #ff6b35;
-            background: linear-gradient(145deg, #ff6b35, #8a2be2);
-            box-shadow: 0 0 20px rgba(255,107,53,0.4);
-        }
-
-        .operation-icon {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .operation-label {
-            font-size: 1.1em;
-            font-weight: 300;
-        }
-
-        .settings-group {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 20px 0;
-            text-align: left;
-            border: 1px solid #333;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-            width: 100%; /* Ensure settings group takes full width for flex display */
-            max-width: 600px; /* Limit width */
-        }
-
-        .settings-group h3 {
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
-            font-size: 1.3em;
-            font-weight: 300;
-        }
-
-        .input-group {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .input-group label {
-            font-weight: 400;
-            min-width: 80px;
-            color: #b0b0b0;
-        }
-
-        /* Adjusted width for all input number, text, and select fields */
-        input[type="number"], input[type="text"], select {
-            padding: 10px 15px;
-            border: 1px solid #444;
-            border-radius: 8px;
-            font-size: 1em;
-            width: 120px; /* Increased width */
-            transition: all 0.3s ease;
-            background: #333;
-            color: #e0e0e0;
-            -webkit-appearance: none; /* Remove default dropdown arrow */
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20256%20256%22%3E%3Cpath%20fill%3D%22%23b0b0b0%22%20d%3D%22M208.5%2080.5L128%20161L47.5%2080.5z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow */
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 12px;
-            padding-right: 30px; /* Make space for the arrow */
-        }
-
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
-
-
-        input[type="number"]:focus, input[type="text"]:focus, select:focus {
-            outline: none;
-            border-color: #8a2be2;
-            background: #3a3a3a;
-            box-shadow: 0 0 10px rgba(138,43,226,0.2);
-        }
-
-        .radio-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-
-        .radio-option:hover {
-            background-color: #333;
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 10px 0;
-            flex-wrap: wrap; /* Allow wrapping for smaller screens */
-        }
-        .checkbox-group label {
-            margin-right: 5px;
-        }
-
-
-        .problem {
-            font-size: 3em;
-            font-weight: 200;
-            margin: 30px 0;
-            color: #e0e0e0;
-            text-shadow: 0 0 20px rgba(224,224,224,0.1);
-        }
-
-        .answer-input {
-            font-size: 2em;
-            padding: 15px 20px;
-            border: 2px solid #444;
-            border-radius: 12px;
-            text-align: center;
-            width: 200px;
-            margin: 20px auto; /* Centering the input horizontally */
-            background: #333;
-            color: #e0e0e0;
-            transition: all 0.3s ease;
-        }
-
-        .answer-input:focus {
-            outline: none;
-            border-color: #8a2be2;
-            background: #3a3a3a;
-            box-shadow: 0 0 20px rgba(138,43,226,0.2);
-        }
-
-        .answer-input.correct-answer {
-            border-color: #27ae60;
-            box-shadow: 0 0 20px rgba(39, 174, 96, 0.4);
-        }
-
-        .answer-input.incorrect-answer {
-            border-color: #e74c3c;
-            box-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
-        }
-
-        .stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 30px 0;
-            flex-wrap: wrap;
-            width: 100%; /* Ensure stats take full width for flex display */
-            max-width: 600px; /* Limit width */
-        }
-
-        .stat-item {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin: 5px;
-            border: 1px solid #333;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-
-        .stat-value {
-            font-size: 1.5em;
-            font-weight: 300;
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            font-size: 0.9em;
-            color: #b0b0b0;
-        }
-
-        .timer {
-            font-size: 2em;
-            color: #e0e0e0;
-            font-weight: bold;
-            margin: 20px 0;
-        }
-
-        .question-timer {
-            font-size: 1.5em;
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-
-        .score-container {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        .score-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-width: 120px;
-        }
-
-        .score-label {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #b0b0b0;
-        }
-
-        .score-number {
-            font-size: 3em;
-            font-weight: bold;
-            text-shadow: 0 0 20px rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-        }
-
-        .score-number.correct {
-            color: #27ae60;
-            text-shadow: 0 0 20px rgba(39, 174, 96, 0.4);
-        }
-
-        .score-number.incorrect {
-            color: #e74c3c;
-            text-shadow: 0 0 20px rgba(231, 76, 60, 0.4);
-        }
-
-        .score-number.pulse {
-            animation: scoreUpdate 0.5s ease;
-        }
-
-        @keyframes scoreUpdate {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 10px;
-            background-color: #333;
-            border-radius: 5px;
-            margin: 20px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #ff6b35, #8a2be2);
-            transition: width 0.3s ease;
-        }
-
-        .operation-stats {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            gap: 10px;
-            width: 100%; /* Ensure it takes full width */
-            max-width: 600px; /* Limit width */
-        }
-
-        .operation-stat {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            text-align: center;
-            min-width: 100px;
-        }
-
-        .operation-stat-label {
-            font-size: 0.9em;
-            color: #b0b0b0;
-            margin-bottom: 5px;
-        }
-
-        .operation-stat-value {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #e0e0e0;
-        }
-
-        .missed-problems-list {
-            list-style: none;
-            padding: 0;
-            max-height: 400px;
-            overflow-y: auto;
-            margin-top: 20px;
-            border-top: 1px solid #444;
-            padding-top: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .missed-problem-item {
-            background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.1em;
-            color: #e0e0e0;
-            border: 1px solid #333;
-        }
-
-        .missed-problem-item .problem-text {
-            font-weight: bold;
-        }
-
-        .missed-problem-item .correct-answer {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        #countdownDisplay {
-            font-size: 5em;
-            font-weight: bold;
-            color: #ff6b35;
-            text-shadow: 0 0 20px rgba(255,107,53,0.5);
-            margin: 50px 0;
-            animation: pulse 1s infinite alternate;
-        }
-
-        @keyframes pulse {
-            from { transform: scale(1); opacity: 1; }
-            to { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .footer-notice {
-            background: rgba(255, 255, 0, 0.1); /* Light yellow background */
-            color: #FFD700; /* Gold/yellow text */
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 30px;
-            font-size: 0.9em;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            width: 100%;
-            max-width: 600px;
-        }
-
-        .footer-notice-content {
-            margin-right: 10px;
-        }
-
-        .footer-notice button {
-            background: none;
-            border: none;
-            color: #FFD700;
-            cursor: pointer;
-            font-size: 1em;
-            padding: 5px 10px;
-            border-radius: 5px;
-            transition: background-color 0.2s ease;
-        }
-
-        .footer-notice button:hover {
-            background-color: rgba(255, 255, 0, 0.2);
-        }
-        
-        /* New styling for the floating show button */
-        #showNoticeFloatingBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(138,43,226,0.8); /* Purple, matching main theme */
-            color: white;
-            border: none;
-            border-radius: 50%; /* Make it circular */
-            width: 50px;
-            height: 50px;
-            font-size: 1.8em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            transition: all 0.3s ease;
-            z-index: 1000; /* Ensure it's above other content */
-            display: none; /* Hidden by default, shown when notice is hidden */
-        }
-
-        #showNoticeFloatingBtn:hover {
-            background: rgba(138,43,226,1);
-            transform: scale(1.1);
-        }
-
-        /* Meme Break Screen Styles - Removed display:flex; here */
-        #memeBreakScreen {
-            gap: 20px;
-            padding: 20px;
-            min-height: 300px; /* Adjust as needed */
-        }
-
-        #memeBreakScreen h2 {
-            font-size: 2.2em;
-            margin-bottom: 10px;
-        }
-
-        #memeDisplay {
-            width: 100%;
-            max-width: 500px;
-            height: auto;
-            max-height: 400px;
-            object-fit: contain; /* Ensures the entire image is visible within its container */
-            border-radius: 15px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            transition: opacity 0.5s ease-in-out;
-            background-color: #000; /* Fallback for transparency */
-        }
-
-        #memeTimer {
-            font-size: 2em;
-            font-weight: bold;
-            color: #ff6b35;
-            text-shadow: 0 0 15px rgba(255,107,53,0.5);
-        }
-
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-                margin: 20px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            .problem {
-                font-size: 2em;
-            }
-            
-            .answer-input {
-                font-size: 1.5em;
-                width: 150px;
-            }
-
-            .score-number {
-                font-size: 2.5em;
-            }
-
-            .score-container {
-                gap: 30px;
-            }
-
-            .operation-selector {
-                gap: 15px;
-            }
-
-            .operation-btn {
-                min-width: 100px;
-                padding: 15px;
-            }
-            #countdownDisplay {
-                font-size: 3.5em;
-            }
-
-            #showNoticeFloatingBtn {
-                width: 40px;
-                height: 40px;
-                font-size: 1.5em;
-                bottom: 15px;
-                right: 15px;
-            }
-        }
-    </style>
+    <title>Mental Math Trainer Pro - The Basics</title>
+    <!-- Link to external CSS file -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Link to Chart.js library -->
+    <script src="chart/dist/chart.umd.js"></script>
+    <!-- Link to Tone.js library for sound generation -->
+    <script src="Tone.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <div id="startScreen" class="screen active">
-            <h1>🧮 Mental Math Trainer Pro</h1>
-            <p style="font-size: 1.2em; margin-bottom: 30px; color: #999;">
-                Master addition, subtraction, and mixed operations with customizable practice sessions
-            </p>
-            <button class="btn" onclick="showSettings()">Start Training</button>
-
-            <div id="footerNotice" class="footer-notice">
-                <span class="footer-notice-content">
-                    This free tool was built for learners who want fast, offline, customizable mental math training — especially on Windows, where good options are hard to find. If you notice a bug or want to suggest a feature, contact me anytime:<br><br>
-                    Email: Potatoslicer18@protonmail.com
-                </span>
-                <button id="hideNoticeBtn" style="font-size: 1.2em;">
-                    👁️ </button>
-            </div>
-        </div>
-
-        <div id="settingsScreen" class="screen">
-            <h2>Customize Your Training</h2>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/>
+                </svg>
+            </button>
             
-            <div class="settings-group">
-                <h3>Select Operations</h3>
-                <div class="operation-selector">
-                    <div class="operation-btn" onclick="toggleOperation('addition')" data-operation="addition">
-                        <div class="operation-icon">➕</div>
-                        <div class="operation-label">Addition</div>
-                    </div>
-                    <div class="operation-btn" onclick="toggleOperation('subtraction')" data-operation="subtraction">
-                        <div class="operation-icon">➖</div>
-                        <div class="operation-label">Subtraction</div>
-                    </div>
-                    <div class="operation-btn" onclick="toggleOperation('multiplication')" data-operation="multiplication">
-                        <div class="operation-icon">✖️</div>
-                        <div class="operation-label">Multiplication</div>
-                    </div>
-                    <div class="operation-btn" onclick="toggleOperation('division')" data-operation="division">
-                        <div class="operation-icon">➗</div>
-                        <div class="operation-label">Division</div>
-                    </div>
-                    <div class="operation-btn" onclick="toggleOperation('mixed')" data-operation="mixed">
-                        <div class="operation-icon">🔀</div>
-                        <div class="operation-label">Mixed</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>Number Range</h3>
-                <div class="input-group">
-                    <label>Min:</label>
-                    <input type="number" id="minNumber" value="1" min="0" max="999">
-                    <label>Max:</label>
-                    <input type="number" id="maxNumber" value="20" min="1" max="999">
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>Practice Mode</h3>
-                <div class="radio-group">
-                    <div class="radio-option">
-                        <input type="radio" id="timedMode" name="practiceMode" value="timed" checked>
-                        <label for="timedMode">Timed Practice</label>
-                        <input type="number" id="practiceMinutes" value="5" min="1" max="60" style="margin-left: 10px;">
-                        <span>minutes</span>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="quantityMode" name="practiceMode" value="quantity">
-                        <label for="quantityMode">Fixed Quantity</label>
-                        <input type="number" id="practiceQuantity" value="20" min="1" max="1000" style="margin-left: 10px;">
-                        <span>problems</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="settings-group">
-                <h3>Preferences</h3>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="enableSounds" checked>
-                    <label for="enableSounds">Enable success chime</label>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="autoEnter" checked>
-                    <label for="autoEnter">Auto-submit when correct digits entered</label>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="timeLimitEnabled">
-                    <label for="timeLimitEnabled">Mark incorrect if answering takes longer than</label>
-                    <input type="number" id="timeLimitSeconds" value="5" min="1" max="60">
-                    <span>seconds</span>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="mistakeThresholdEnabled">
-                    <select id="mistakeThresholdAction" style="width: auto;">
-                        <option value="end">End</option>
-                        <option value="restart">Restart</option>
-                    </select>
-                    <label for="mistakeThresholdAction">session if</label>
-                    <input type="number" id="mistakeThresholdCount" value="3" min="1" max="100">
-                    <span>mistakes are made</span>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="hideQuestionTimer">
-                    <label for="hideQuestionTimer">Hide question timer display</label>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" id="memeBreakEnabled">
-                    <label for="memeBreakEnabled">Every</label>
-                    <input type="number" id="memeBreakInterval" value="10" min="1" max="100">
-                    <label for="memeBreakInterval">problems allow a meme break for</label>
-                    <input type="number" id="memeBreakDuration" value="5" min="1" max="60">
-                    <label for="memeBreakDuration">seconds</label>
-                    <label for="memeBreakSlideshowSpeed">with a slideshow speed of</label>
-                    <input type="number" id="memeBreakSlideshowSpeed" value="2" min="1" max="30">
-                    <label for="memeBreakSlideshowSpeed">seconds</label>
-                </div>
-            </div>
-
-            <button class="btn" onclick="startPractice()">Begin Practice</button>
-            <button class="btn" onclick="saveSettings()">Save Settings</button> <button class="btn btn-secondary" onclick="showStart()">Back</button>
-        </div>
-
-        <div id="practiceScreen" class="screen">
-            <div id="countdownDisplay" style="display: none;"></div>
-            <div id="timerDisplay" class="timer" style="display: none;"></div>
-            <div id="progressContainer" style="display: none;">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressBar" style="width: 0%;"></div>
-                </div>
-                <div id="progressText">Problem 1 of 20</div>
+            <div class="logo">
+                <h1>Mental Math Trainer Pro</h1>
+                <p>The Basics</p>
             </div>
             
-            <div class="question-timer" id="questionTimer">0.0s</div>
-            
-            <div class="stats">
-                <div class="stat-item">
-                    <div id="correctCount" class="stat-value">0</div>
-                    <div class="stat-label">Correct</div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active tooltip" data-page="dashboard" data-tooltip="Dashboard">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8v-6h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link tooltip" data-page="settings" data-tooltip="Settings">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.82,11.69,4.82,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/>
+                        </svg>
+                        <span class="nav-text">Advanced Settings</span>
+                    </a>
+                </li>
+                <!-- New GitHub Link -->
+                <li class="nav-item">
+                    <a href="#" class="nav-link tooltip" data-page="github" data-tooltip="GitHub">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.835 2.809 1.305 3.493.998.108-.776.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                        </svg>
+                        <span class="nav-text">GitHub</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <nav class="breadcrumb">
+                    <a href="#" class="breadcrumb-item active">Dashboard</a>
+                </nav>
+
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <p class="page-subtitle">Track your progress and start your mental math training</p>
                 </div>
-                <div class="stat-item">
-                    <div id="incorrectCount" class="stat-value">0</div>
-                    <div class="stat-label">Incorrect</div>
+
+                <!-- Performance Stats with Circular Progress -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="circular-progress">
+                            <svg>
+                                <circle class="progress-ring" cx="40" cy="40" r="32"></circle>
+                                <circle class="progress-fill" cx="40" cy="40" r="32" stroke-dasharray="201.06" stroke-dashoffset="40.21"></circle>
+                            </svg>
+                            <div class="progress-text" id="problemsSolvedCount">0</div>
+                        </div>
+                        <div class="stat-label">Problems Solved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="circular-progress">
+                            <svg>
+                                <circle class="progress-ring" cx="40" cy="40" r="32"></circle>
+                                <circle class="progress-fill" cx="40" cy="40" r="32" stroke-dasharray="201.06" stroke-dashoffset="12.06"></circle>
+                            </svg>
+                            <div class="progress-text">94%</div>
+                        </div>
+                        <div class="stat-label">Accuracy Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="circular-progress">
+                            <svg>
+                                <circle class="progress-ring" cx="40" cy="40" r="32"></circle>
+                                <circle class="progress-fill" cx="40" cy="40" r="32" stroke-dasharray="201.06" stroke-dashoffset="120.64"></circle>
+                            </svg>
+                            <div class="progress-text">2.3s</div>
+                        </div>
+                        <div class="stat-label">Avg Response Time</div>
+                    </div>
+                    <!-- Quick Start Card moved here and modified -->
+                    <div class="stat-card">
+                        <div class="stat-icon"> <!-- Changed from circular-progress -->
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="var(--primary-color)">
+                                <!-- Standard checkmark path -->
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                            </svg>
+                        </div>
+                        <div class="stat-label">Quick Start</div>
+                        <button class="stat-card-action" id="startPracticeBtn">Start</button>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div id="accuracyRate" class="stat-value">0%</div>
-                    <div class="stat-label">Accuracy</div>
+
+                <!-- Main Cards -->
+                <div class="cards-grid">
+                    <!-- Recent Performance Card re-added with new structure -->
+                    <div class="card recent-sessions-card">
+                        <div class="card-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                                <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.51 0-2.91-.49-4.06-1.3l-1.42 1.42C9.4 19.5 11.13 20 13 20c4.97 0 9-4.03 9-9s-4.03-9-9-9z"/>
+                            </svg>
+                        </div>
+                        <h3 class="card-title">Recent Performance</h3>
+                        <p class="card-description">Overview of your last few training sessions.</p>
+
+                        <div id="recentSessionsContainer" class="recent-sessions-list">
+                            <!-- Date-grouped micro cards will be dynamically inserted here by JavaScript -->
+                            <p style="text-align: center; color: var(--text-secondary);">No recent sessions yet. Start a practice session!</p>
+                        </div>
+                        <div id="paginationControls" class="pagination-controls">
+                            <!-- Pagination buttons will be dynamically inserted here by JavaScript -->
+                        </div>
+                    </div>
+                    <!-- Removed Custom Practice Card -->
                 </div>
             </div>
 
-            <div class="operation-stats" id="operationStats" style="display: none;">
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Addition</div>
-                    <div id="additionStat" class="operation-stat-value">0/0</div>
+            <!-- Advanced Settings Page -->
+            <div id="settings" class="page">
+                <nav class="breadcrumb">
+                    <a href="#" class="breadcrumb-item" onclick="switchPage('dashboard')">Dashboard</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb-item active">Settings</span>
+                </nav>
+
+                <div class="page-header">
+                    <h1 class="page-title">Advanced Settings</h1>
+                    <p class="page-subtitle">Customize your mental math training experience</p>
                 </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Subtraction</div>
-                    <div class="operation-stat-label">Subtraction</div>
-                    <div id="subtractionStat" class="operation-stat-value">0/0</div>
+
+                <!-- Settings Tabs -->
+                <div class="settings-tabs">
+                    <button class="tab-btn active" data-tab="general">General</button>
+                    <button class="tab-btn" data-tab="performance">Performance</button>
+                    <button class="tab-btn" data-tab="theme">Theme</button>
                 </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Multiplication</div>
-                    <div id="multiplicationStat" class="operation-stat-value">0/0</div>
+
+                <!-- General Tab -->
+                <div id="general" class="tab-content active">
+                    <div class="settings-section">
+                        <h3 class="settings-title">Practice Mode</h3>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="practiceMode" value="timed" id="practiceModeTimed">
+                                Timed Practice
+                                <input type="number" value="5" min="1" id="timedMinutes"> Minutes
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="practiceMode" value="fixed" id="practiceModeFixed">
+                                Fixed Quantity
+                                <input type="number" value="25" min="1" id="fixedProblems"> Problems
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Operation Types</h3>
+                        <div class="setting-item operation-item" data-operation="addition">
+                            <span class="setting-label">Addition</span>
+                            <div class="operation-controls">
+                                <span class="toggle-control" data-state="enabled">Enabled</span>
+                                <span class="dropdown-trigger">Settings</span>
+                            </div>
+                            <div class="operation-dropdown">
+                                <div class="dropdown-section">
+                                    <label>Value Range For Operation</label>
+                                    <div class="range-inputs">
+                                        Start of Range <input type="number" value="1" class="range-start">
+                                        End of Range <input type="number" value="100" class="range-end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item operation-item" data-operation="subtract">
+                            <span class="setting-label">Subtraction</span>
+                            <div class="operation-controls">
+                                <span class="toggle-control" data-state="enabled">Enabled</span>
+                                <span class="dropdown-trigger">Settings</span>
+                            </div>
+                            <div class="operation-dropdown">
+                                <div class="dropdown-section">
+                                    <label>Always larger number first</label>
+                                    <input type="checkbox" class="larger-first" checked>
+                                </div>
+                                <div class="dropdown-section">
+                                    <label>Value Range For Operation</label>
+                                    <div class="range-inputs">
+                                        Start of Range <input type="number" value="1" class="range-start">
+                                        End of Range <input type="number" value="100" class="range-end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item operation-item" data-operation="multiply">
+                            <span class="setting-label">Multiplication</span>
+                            <div class="operation-controls">
+                                <span class="toggle-control" data-state="enabled">Enabled</span>
+                                <span class="dropdown-trigger">Settings</span>
+                            </div>
+                            <div class="operation-dropdown">
+                                <div class="dropdown-section">
+                                    <label>Value Range For Operation</label>
+                                    <div class="range-inputs">
+                                        Start of Range <input type="number" value="1" class="range-start">
+                                        End of Range <input type="number" value="12" class="range-end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="setting-item operation-item" data-operation="divide">
+                            <span class="setting-label">Division</span>
+                            <div class="operation-controls">
+                                <span class="toggle-control" data-state="enabled">Enabled</span>
+                                <span class="dropdown-trigger">Settings</span>
+                            </div>
+                            <div class="operation-dropdown">
+                                <div class="dropdown-section">
+                                    <label>Value Range For Operation</label>
+                                    <div class="range-inputs">
+                                        Start of Range <input type="number" value="1" class="range-start">
+                                        End of Range <input type="number" value="100" class="range-end">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Operation Proportions</h3>
+                        <canvas id="operationPieChart" style="max-width: 400px; margin: auto;"></canvas>
+                        <p style="text-align: center; margin-top: 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">Drag sliders below to adjust proportions (total must equal 100%)</p>
+                        <div id="slidersContainer" style="max-width: 400px; margin: auto;"></div>
+                    </div>
                 </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Division</div>
-                    <div id="divisionStat" class="operation-stat-value">0/0</div>
+
+                <!-- Performance Tab -->
+                <div id="performance" class="tab-content">
+                    <div class="settings-section">
+                        <h3 class="settings-title">Audio & Feedback</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Success chime</span>
+                            <span class="toggle-control" data-setting-id="successChime" data-state="enabled">Enabled</span>
+                            <button id="testChimeBtn" style="margin-left: 10px; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--primary-color); color: white; cursor: pointer;">Test Chime</button>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Error buzzer</span>
+                            <span class="toggle-control" data-setting-id="errorBuzzer" data-state="enabled">Enabled</span>
+                            <button id="testBuzzerBtn" style="margin-left: 10px; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--primary-color); background: var(--primary-color); color: white; cursor: pointer;">Test Buzzer</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Problem Presentation Mode</h3>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="problemPresentationMode" value="displayVisual" checked>
+                                <div>
+                                    Display visually, no speech or hiding.
+                                    <p class="setting-subtitle" style="font-size: 0.85em; color: var(--text-secondary);">The most neutral visual-only mode</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="problemPresentationMode" value="displayBriefly" id="displayBrieflyRadio">
+                                <div>
+                                    Display briefly, then hide after <input type="number" id="briefDisplayDuration" value="2" min="1" class="setting-control"> seconds.
+                                    <p class="setting-subtitle" style="font-size: 0.85em; color: var(--text-secondary);">For short-term visual memory testing</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="problemPresentationMode" value="speakAloud">
+                                <div>
+                                    Speak aloud, do not display visually.
+                                    <p class="setting-subtitle" style="font-size: 0.85em; color: var(--text-secondary);">Audio-only mode for listening practice</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="setting-item">
+                            <label class="practice-mode-option">
+                                <input type="radio" name="problemPresentationMode" value="displaySpeak">
+                                <div>
+                                    Display visually and speak aloud simultaneously.
+                                    <p class="setting-subtitle" style="font-size: 0.85em; color: var(--text-secondary);">Maximizes clarity with both channels</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Timing Behavior</h3>
+                        <div class="setting-item">
+                            <span class="setting-label">Auto-submit on correct digits</span>
+                            <span class="toggle-control" data-setting-id="autoSubmit" data-state="enabled">Enabled</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Mark incorrect if answering takes longer than</span>
+                            <input type="number" value="3" min="1" class="setting-control" data-setting-id="maxResponseTime">&nbsp;seconds&nbsp;&nbsp;
+                            <span class="toggle-control" data-setting-id="enableMaxResponseTime" data-state="enabled">Enabled</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Hide timer display during session</span>
+                            <span class="toggle-control" data-setting-id="hideTimer" data-state="disabled">Disabled</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3 class="settings-title">Failure Conditions</h3>
+                        <div class="setting-item">
+                            <select class="setting-control" data-setting-id="failureAction" style="width: 120px;">
+                                <option value="end">End</option>
+                                <option value="restart">Restart</option>
+                            </select>
+                            <span class="setting-label" style="flex-basis: auto; margin-left: 10px;">session if&nbsp;</span>
+                            <input type="number" value="3" min="1" class="setting-control" data-setting-id="maxMistakes">
+                            <span class="setting-label" style="flex-basis: auto; margin-left: 5px;">mistakes are made&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                            <span class="toggle-control" data-setting-id="enableFailureCondition" data-state="disabled">Disabled</span>
+                        </div>
+                        <div class="setting-item">
+                            <span class="setting-label">Retry Until Correct</span>
+                            <span class="toggle-control" data-setting-id="retryUntilCorrect" data-state="disabled">Disabled</span>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Theme Tab Content -->
+                <div class="tab-content" id="theme">
+                    <section class="settings-section">
+                        <h3 class="settings-title">Customize Colors</h3>
+                        <p>Adjust the primary colors of the application to match your style.</p>
+                        <div class="color-options-grid">
+                            <div class="color-option">
+                                <label for="primaryColor">Primary Color</label>
+                                <input type="color" id="primaryColor" data-color-var="--primary-color">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="secondaryColor">Secondary Color</label>
+                                <input type="color" id="secondaryColor" data-color-var="--secondary-color">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="bgColorPrimary">Background Primary</label>
+                                <input type="color" id="bgColorPrimary" data-color-var="--bg-primary">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="bgColorSecondary">Background Secondary</label>
+                                <input type="color" id="bgColorSecondary" data-color-var="--bg-secondary">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="textColorPrimary">Text Primary</label>
+                                <input type="color" id="textColorPrimary" data-color-var="--text-primary">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="textColorSecondary">Text Secondary</label>
+                                <input type="color" id="textColorSecondary" data-color-var="--text-secondary">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="glassBg">Glass Background</label>
+                                <input type="color" id="glassBg" data-color-var="--glass-bg">
+                                <span class="color-swatch"></span>
+                            </div>
+                             <div class="color-option">
+                                <label for="glassBorder">Glass Border</label>
+                                <input type="color" id="glassBorder" data-color-var="--glass-border">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="cardBg">Card Background</label>
+                                <input type="color" id="cardBg" data-color-var="--card-bg">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="popupBgStart">Popup Background Start</label>
+                                <input type="color" id="popupBgStart" data-color-var="--popup-bg-start">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="popupBgEnd">Popup Background End</label>
+                                <input type="color" id="popupBgEnd" data-color-var="--popup-bg-end">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="popupBorder">Popup Border</label>
+                                <input type="color" id="popupBorder" data-color-var="--popup-border">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="popupShadowColor">Popup Shadow Color</label>
+                                <input type="color" id="popupShadowColor" data-color-var="--popup-shadow-color">
+                                <span class="color-swatch"></span>
+                            </div>
+                            <div class="color-option">
+                                <label for="popupAccentGlow">Popup Accent Glow</label>
+                                <input type="color" id="popupAccentGlow" data-color-var="--popup-accent-glow">
+                                <span class="color-swatch"></span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary mt-1" id="restoreDefaultColorsBtn">Reset to Defaults</button>
+                    </section>
+                </div>
+                
+                <!-- Save Settings Button -->
+                <button class="save-settings-btn" id="saveSettingsBtn">Save Settings</button>
             </div>
 
-            <div class="score-container">
-                <div class="score-section">
-                    <div class="score-label">Correct</div>
-                    <div id="correctScore" class="score-number correct">0</div>
+            <!-- GitHub Page -->
+            <div id="github" class="page">
+                <nav class="breadcrumb">
+                    <a href="#" class="breadcrumb-item" onclick="switchPage('dashboard')">Dashboard</a>
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb-item active">GitHub</span>
+                </nav>
+
+                <div class="page-header">
+                    <h1 class="page-title">GitHub</h1>
+                    <p class="page-subtitle">Find the source code, releases, and contact information.</p>
                 </div>
-                <div class="score-section">
-                    <div class="score-label">Incorrect</div>
-                    <div id="incorrectScore" class="score-number incorrect">0</div>
+
+                <div class="settings-section">
+                    <h3 class="settings-title">Repository & Releases</h3>
+                    <div class="setting-item">
+                        <span class="setting-label">Official GitHub Repo:</span>
+                        <a href="https://github.com/MathTrainerPro/MentalMathTrainerPro/tree/main" target="_blank" class="setting-control">View Repository</a>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Releases (Download Page):</span>
+                        <a href="https://github.com/MathTrainerPro/MentalMathTrainerPro/releases" target="_blank" class="setting-control">Download Releases</a>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3 class="settings-title">📬 Contact</h3>
+                    <p class="card-description">Found a bug or want to suggest a feature?</p>
+                    <div class="setting-item">
+                        <span class="setting-label">📧 Email:</span>
+                        <pre><code>PotatoSlicer18@protonmail.com</code></pre>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3 class="settings-title">📄 License</h3>
+                    <p class="card-description">MIT License — free to use, fork, modify, and share.</p>
+                    <p class="card-description">A credit is appreciated but not required.</p>
                 </div>
             </div>
+        </main>
+    </div>
 
-            <div id="problemDisplay" class="problem">5 + 3 = ?</div>
-            <input type="number" id="answerInput" class="answer-input" placeholder="?" autocomplete="off">
-            
-            <div style="margin-top: 30px;">
-                <button id="submitBtn" class="btn" onclick="submitAnswer()">Submit</button>
-                <button class="btn btn-secondary" onclick="endPractice()">End Practice</button>
+    <!-- Save Confirmation Message -->
+    <div class="save-confirmation" id="saveConfirmationMessage">
+        <svg viewBox="0 0 24 24">
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+        </svg>
+        <span>Settings saved successfully!</span>
+    </div>
+
+    <!-- Analytics Modal -->
+    <div class="modal-overlay" id="analyticsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Performance Analytics</h3>
+                <button class="modal-close" onclick="hideModal('analyticsModal')">×</button>
             </div>
-        </div>
-
-        <div id="memeBreakScreen" class="screen">
-            <h2>Meme Break! 😂</h2>
-            <img id="memeDisplay" src="" alt="Meme">
-            <div id="memeTimer"></div>
-        </div>
-
-        <div id="resultsScreen" class="screen">
-            <h2>Practice Complete! 🎉</h2>
-            <div class="stats">
-                <div class="stat-item">
-                    <div id="finalCorrect" class="stat-value">0</div>
-                    <div class="stat-label">Correct Answers</div>
-                </div>
-                <div class="stat-item">
-                    <div id="finalIncorrect" class="stat-value">0</div>
-                    <div class="stat-label">Incorrect Answers</div>
-                </div>
-                <div class="stat-item">
-                    <div id="finalAccuracy" class="stat-value">0%</div>
-                    <div class="stat-label">Final Accuracy</div>
-                </div>
-                <div class="stat-item">
-                    <div id="finalTime" class="stat-value">0:00</div>
-                    <div class="stat-label">Time Elapsed</div>
-                </div>
-                <div class="stat-item">
-                    <div id="averageTime" class="stat-value">0.0s</div>
-                    <div class="stat-label">Avg. Time/Problem</div>
-                </div>
+            <div class="modal-body">
+                <div class="skeleton skeleton-card"></div>
+                <div class="skeleton skeleton-text medium"></div>
+                <div class="skeleton skeleton-text short"></div>
+                <div class="skeleton skeleton-text long"></div>
             </div>
-
-            <div id="finalOperationStats" class="operation-stats" style="display: none;">
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Addition</div>
-                    <div id="finalAdditionStat" class="operation-stat-value">0/0 (0%)</div>
-                </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Subtraction</div>
-                    <div id="finalSubtractionStat" class="operation-stat-value">0/0 (0%)</div>
-                </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Multiplication</div>
-                    <div id="finalMultiplicationStat" class="operation-stat-value">0/0 (0%)</div>
-                </div>
-                <div class="operation-stat">
-                    <div class="operation-stat-label">Division</div>
-                    <div id="finalDivisionStat" class="operation-stat-value">0/0 (0%)</div>
-                </div>
-            </div>
-            
-            <button class="btn" onclick="showSettings()">Practice Again</button>
-            <button id="viewMissedProblemsBtn" class="btn" onclick="showMissedProblems()" style="display:none;">View Missed Problems</button>
-            <button class="btn" onclick="exportSessionProgress()">Export Progress</button>
-            <button class="btn btn-secondary" onclick="showStart()">Main Menu</button>
-        </div>
-
-        <div id="missedProblemsScreen" class="screen">
-            <h2>Missed Problems 🤔</h2>
-            <p style="margin-bottom: 20px; color: #b0b0b0;">Review the problems you got wrong:</p>
-            <ul id="missedProblemsList" class="missed-problems-list">
-                </ul>
-            <button class="btn btn-secondary" onclick="showResults()">Back to Results</button>
         </div>
     </div>
 
-    <button id="showNoticeFloatingBtn" onclick="toggleFooterNotice()">
-        👁️
-    </button>
-
-    <script>
-        // Game state
-        let gameState = {
-            operations: ['addition'], // Default to addition only
-            minNum: 1,
-            maxNum: 20,
-            mode: 'timed',
-            duration: 5,
-            quantity: 20,
-            soundsEnabled: true,
-            autoEnter: true,
-            timeLimitEnabled: false, // New: for time limit per question
-            timeLimitSeconds: 5,     // New: for time limit per question
-            mistakeThresholdEnabled: false, // New: for mistake threshold
-            mistakeThresholdAction: 'end',  // New: 'end' or 'restart'
-            mistakeThresholdCount: 3,       // New: number of mistakes
-            hideQuestionTimer: false, // New: Hide question timer display
-            
-            // New Meme Break State
-            memeBreakEnabled: false,
-            memeBreakInterval: 10,
-            memeBreakDuration: 5,
-            memeBreakSlideshowSpeed: 2, // New: Slideshow speed in seconds
-            problemsUntilMemeBreak: 0,
-            memeBreakTimer: null,
-            memeSlideshowInterval: null,
-            currentMemeIndex: 0,
-            memeImages: [
-                'meme/meme1.png',
-                'meme/meme2.png',
-                'meme/meme3.png',
-                // Add more meme image paths here (e.g., 'meme/another_meme.png')
-            ],
-
-            currentProblem: null,
-            correct: 0,
-            incorrect: 0,
-            problemCount: 0,
-            startTime: null,
-            timer: null,
-            timeLeft: 0,
-            questionStartTime: null,
-            questionTimer: null,
-            operationStats: {
-                addition: { correct: 0, total: 0 },
-                subtraction: { correct: 0, total: 0 },
-                multiplication: { correct: 0, total: 0 },
-                division: { correct: 0, total: 0 }
-            },
-            problemTimes: [], // New: Store time for each problem
-            missedProblems: [], // New: Store details of missed problems
-            audioContext: null // Add AudioContext to gameState
-        };
-
-        // Audio for success and failure chimes
-        function playChime(isCorrect) {
-            if (!gameState.soundsEnabled) return;
-
-            if (!gameState.audioContext) {
-                gameState.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-
-            const oscillator = gameState.audioContext.createOscillator();
-            const gain = gameState.audioContext.createGain();
-            
-            oscillator.connect(gain);
-            gain.connect(gameState.audioContext.destination);
-            
-            if (isCorrect) {
-                // Success chime (ascending tones)
-                oscillator.frequency.setValueAtTime(523.25, gameState.audioContext.currentTime); // C5
-                oscillator.frequency.setValueAtTime(659.25, gameState.audioContext.currentTime + 0.05); // E5
-                oscillator.frequency.setValueAtTime(783.99, gameState.audioContext.currentTime + 0.1); // G5
-            } else {
-                // Failure chime (descending tone)
-                oscillator.frequency.setValueAtTime(220, gameState.audioContext.currentTime); // A3
-                oscillator.frequency.setValueAtTime(164.81, gameState.audioContext.currentTime + 0.05); // E3
-                oscillator.frequency.setValueAtTime(130.81, gameState.audioContext.currentTime + 0.1); // C3
-            }
-            
-            gain.gain.setValueAtTime(0.1, gameState.audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, gameState.audioContext.currentTime + 0.3);
-            
-            oscillator.start(gameState.audioContext.currentTime);
-            oscillator.stop(gameState.audioContext.currentTime + 0.3);
-        }
-
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-            // Re-apply styles needed for certain screens when they become active
-            if (screenId === 'startScreen') {
-                document.querySelector('#startScreen > h1').style.display = 'block'; // Example if start screen needed specific block display
-                document.querySelector('#startScreen > p').style.display = 'block';
-            } else {
-                 document.querySelector('#startScreen > h1').style.display = ''; // Reset display
-                 document.querySelector('#startScreen > p').style.display = '';
-            }
-        }
-
-        function showStart() {
-            showScreen('startScreen');
-            // Ensure footer notice state is applied when showing the start screen
-            applyFooterNoticeState();
-        }
-
-        function showSettings() {
-            showScreen('settingsScreen');
-            // Ensure UI reflects current gameState settings
-            document.getElementById('minNumber').value = gameState.minNum;
-            document.getElementById('maxNumber').value = gameState.maxNum;
-            document.getElementById('practiceMinutes').value = gameState.duration;
-            document.getElementById('practiceQuantity').value = gameState.quantity;
-            document.getElementById('enableSounds').checked = gameState.soundsEnabled;
-            document.getElementById('autoEnter').checked = gameState.autoEnter;
-            document.getElementById('timeLimitEnabled').checked = gameState.timeLimitEnabled;
-            document.getElementById('timeLimitSeconds').value = gameState.timeLimitSeconds;
-            document.getElementById('mistakeThresholdEnabled').checked = gameState.mistakeThresholdEnabled; // Update new preference
-            document.getElementById('mistakeThresholdAction').value = gameState.mistakeThresholdAction;     // Update new preference
-            document.getElementById('mistakeThresholdCount').value = gameState.mistakeThresholdCount;       // Update new preference
-            document.getElementById('hideQuestionTimer').checked = gameState.hideQuestionTimer; // Update new preference
-            
-            // New Meme Break Settings
-            document.getElementById('memeBreakEnabled').checked = gameState.memeBreakEnabled;
-            document.getElementById('memeBreakInterval').value = gameState.memeBreakInterval;
-            document.getElementById('memeBreakDuration').value = gameState.memeBreakDuration;
-            document.getElementById('memeBreakSlideshowSpeed').value = gameState.memeBreakSlideshowSpeed; // New: Slideshow speed
-
-            if (gameState.mode === 'timed') {
-                document.getElementById('timedMode').checked = true;
-            } else {
-                document.getElementById('quantityMode').checked = true;
-            }
-
-            // Update operation buttons selection
-            const allOps = ['addition', 'subtraction', 'multiplication', 'division'];
-            allOps.forEach(op => {
-                const btn = document.querySelector(`[data-operation="${op}"]`);
-                if (gameState.operations.includes(op)) {
-                    btn.classList.add('selected');
-                } else {
-                    btn.classList.remove('selected');
-                }
-            });
-
-            // Handle mixed button visual state
-            const mixedBtn = document.querySelector('[data-operation="mixed"]');
-            if (allOps.every(op => gameState.operations.includes(op)) && gameState.operations.length === allOps.length) {
-                mixedBtn.classList.add('selected');
-            } else {
-                mixedBtn.classList.remove('selected');
-            }
-            
-            // Hide the floating button when on settings screen
-            document.getElementById('showNoticeFloatingBtn').style.display = 'none';
-        }
-
-        function toggleOperation(operation) {
-            const btn = document.querySelector(`[data-operation="${operation}"]`);
-            const allIndividualOps = ['addition', 'subtraction', 'multiplication', 'division'];
-            const mixedBtn = document.querySelector('[data-operation="mixed"]');
-        
-            if (operation === 'mixed') {
-                if (btn.classList.contains('selected')) {
-                    // If mixed is deselected, deselect all individual operations too.
-                    // But ensure at least one operation is left selected or default to addition.
-                    allIndividualOps.forEach(op => {
-                        document.querySelector(`[data-operation="${op}"]`).classList.remove('selected');
-                    });
-                    btn.classList.remove('selected');
-                    gameState.operations = [];
-                    // Default to addition if nothing is selected after deselecting mixed
-                    if (gameState.operations.length === 0) {
-                        document.querySelector('[data-operation="addition"]').classList.add('selected');
-                        gameState.operations.push('addition');
-                    }
-                } else {
-                    // If mixed is selected, select all individual operations
-                    allIndividualOps.forEach(op => {
-                        document.querySelector(`[data-operation="${op}"]`).classList.add('selected');
-                    });
-                    btn.classList.add('selected');
-                    gameState.operations = [...allIndividualOps]; // Add all unique operations
-                }
-            } else {
-                // Toggling individual operation
-                if (btn.classList.contains('selected')) {
-                    // Don't allow deselecting if it's the only one selected
-                    if (gameState.operations.length === 1 && gameState.operations[0] === operation) {
-                        alert('You must select at least one operation!');
-                        return;
-                    }
-                    btn.classList.remove('selected');
-                    gameState.operations = gameState.operations.filter(op => op !== operation);
-                } else {
-                    btn.classList.add('selected');
-                    if (!gameState.operations.includes(operation)) {
-                        gameState.operations.push(operation);
-                    }
-                }
-        
-                // Update mixed button state based on individual selections
-                const allSelected = allIndividualOps.every(op => document.querySelector(`[data-operation="${op}"]`).classList.contains('selected'));
-                if (allSelected) {
-                    mixedBtn.classList.add('selected');
-                } else {
-                    mixedBtn.classList.remove('selected');
-                }
-            }
-        
-            // Ensure at least one operation is always selected visually and in state
-            if (gameState.operations.length === 0) {
-                // If somehow nothing is selected, default to addition
-                document.querySelector('[data-operation="addition"]').classList.add('selected');
-                gameState.operations.push('addition');
-            }
-        }
-
-
-        function generateProblem() {
-            // Choose random operation from selected operations
-            const operation = gameState.operations[Math.floor(Math.random() * gameState.operations.length)];
-            
-            let num1, num2, answer, symbol;
-            
-            // Clear input and styling immediately when new problem is generated
-            document.getElementById('answerInput').value = '';
-            document.getElementById('answerInput').classList.remove('correct-answer', 'incorrect-answer');
-
-            switch (operation) {
-                case 'addition':
-                    num1 = Math.floor(Math.random() * (gameState.maxNum - gameState.minNum + 1)) + gameState.minNum;
-                    num2 = Math.floor(Math.random() * (gameState.maxNum - gameState.minNum + 1)) + gameState.minNum;
-                    answer = num1 + num2;
-                    symbol = '+';
-                    break;
-                case 'subtraction':
-                    num1 = Math.floor(Math.random() * (gameState.maxNum - gameState.minNum + 1)) + gameState.minNum;
-                    // Ensure num1 >= num2 for positive result
-                    num2 = Math.floor(Math.random() * (num1 - gameState.minNum + 1)) + gameState.minNum;
-                    answer = num1 - num2;
-                    symbol = '-';
-                    break;
-                case 'multiplication':
-                    // Keep factors relatively small for mental math if maxNum is large
-                    const maxFactor = Math.min(gameState.maxNum, 12); // Limit factors to 12 for tables, or maxNum if maxNum is small
-                    num1 = Math.floor(Math.random() * (maxFactor - gameState.minNum + 1)) + gameState.minNum;
-                    num2 = Math.floor(Math.random() * (maxFactor - gameState.minNum + 1)) + gameState.minNum;
-                    answer = num1 * num2;
-                    symbol = '×';
-                    break;
-                case 'division':
-                    let tempAnswer, tempNum2;
-                    do {
-                        tempAnswer = Math.floor(Math.random() * (gameState.maxNum - gameState.minNum + 1)) + gameState.minNum;
-                        tempNum2 = Math.floor(Math.random() * (Math.min(gameState.maxNum, 12) - gameState.minNum + 1)) + gameState.minNum; // Divisor also relatively small
-                        // Ensure tempNum2 is not 0
-                        if (tempNum2 === 0) tempNum2 = 1;
-                        num1 = tempAnswer * tempNum2;
-                    } while (num1 > gameState.maxNum * 5 || tempAnswer === 0); // Ensure dividend is not too large and answer isn't 0
-                    num2 = tempNum2;
-                    answer = tempAnswer;
-                    symbol = '÷';
-                    break;
-            }
-            
-            gameState.currentProblem = {
-                num1: num1,
-                num2: num2,
-                answer: answer,
-                operation: operation,
-                symbol: symbol
-            };
-            
-            document.getElementById('problemDisplay').textContent = `${num1} ${symbol} ${num2} = ?`;
-            document.getElementById('answerInput').focus();
-            
-            // Start question timer only if not hidden
-            if (!gameState.hideQuestionTimer) {
-                gameState.questionStartTime = Date.now();
-                if (gameState.questionTimer) {
-                    clearInterval(gameState.questionTimer);
-                }
-                document.getElementById('questionTimer').style.display = 'block'; // Ensure it's visible if not hidden
-                gameState.questionTimer = setInterval(updateQuestionTimer, 100);
-            } else {
-                document.getElementById('questionTimer').style.display = 'none'; // Hide if preference is set
-                if (gameState.questionTimer) {
-                    clearInterval(gameState.questionTimer); // Clear any existing timer
-                    gameState.questionTimer = null;
-                }
-                gameState.questionStartTime = null; // No timer running
-            }
-        }
-
-        function updateQuestionTimer() {
-            if (gameState.questionStartTime) {
-                const elapsed = (Date.now() - gameState.questionStartTime) / 1000;
-                document.getElementById('questionTimer').textContent = elapsed.toFixed(1) + 's';
-                
-                // Check for time limit if enabled
-                if (gameState.timeLimitEnabled && elapsed > gameState.timeLimitSeconds) {
-                    submitAnswer(true); // Force submit as incorrect due to time limit
-                }
-            }
-        }
-
-        function updateScoreNumbers(isCorrect) {
-            const scoreElement = isCorrect ? 
-                document.getElementById('correctScore') : 
-                document.getElementById('incorrectScore');
-            
-            scoreElement.textContent = isCorrect ? gameState.correct : gameState.incorrect;
-            
-            scoreElement.classList.add('pulse');
-            setTimeout(() => {
-                scoreElement.classList.remove('pulse');
-            }, 500);
-        }
-
-        function updateStats() {
-            document.getElementById('correctCount').textContent = gameState.correct;
-            document.getElementById('incorrectCount').textContent = gameState.incorrect;
-            
-            const total = gameState.correct + gameState.incorrect;
-            const accuracy = total > 0 ? Math.round((gameState.correct / total) * 100) : 0;
-            document.getElementById('accuracyRate').textContent = accuracy + '%';
-        }
-
-        function updateOperationStats() {
-            const allOps = ['addition', 'subtraction', 'multiplication', 'division'];
-            let shouldShowOperationStats = false;
-            // Show operation stats if more than one type of operation is selected
-            if (gameState.operations.length > 1) {
-                 shouldShowOperationStats = true;
-            }
-            // Or if all operations are selected (which implies mixed mode)
-            if (allOps.every(op => gameState.operations.includes(op)) && gameState.operations.length === allOps.length) {
-                shouldShowOperationStats = true;
-            }
-
-
-            if (shouldShowOperationStats) {
-                document.getElementById('operationStats').style.display = 'flex';
-                allOps.forEach(op => {
-                    const statElement = document.getElementById(`${op}Stat`);
-                    if (statElement) { // Check if element exists for the operation
-                        const stats = gameState.operationStats[op];
-                        statElement.textContent = `${stats.correct}/${stats.total}`;
-                    }
-                });
-            } else {
-                document.getElementById('operationStats').style.display = 'none';
-            }
-        }
-
-        function updateProgress() {
-            if (gameState.mode === 'quantity') {
-                document.getElementById('progressContainer').style.display = 'block';
-                document.getElementById('timerDisplay').style.display = 'none';
-
-                const progress = (gameState.problemCount / gameState.quantity) * 100;
-                document.getElementById('progressBar').style.width = progress + '%';
-                document.getElementById('progressText').textContent = 
-                    `Problem ${gameState.problemCount} of ${gameState.quantity}`;
-            } else { // Timed mode
-                document.getElementById('progressContainer').style.display = 'none';
-                document.getElementById('timerDisplay').style.display = 'block';
-            }
-        }
-
-        function updateTimerDisplay() {
-            if (gameState.mode === 'timed') {
-                const minutes = Math.floor(gameState.timeLeft / 60);
-                const seconds = gameState.timeLeft % 60;
-                document.getElementById('timerDisplay').textContent = 
-                    `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                
-                if (gameState.timeLeft <= 0) {
-                    endPractice();
-                    return;
-                }
-                
-                gameState.timeLeft--;
-            }
-        }
-
-        function saveSettings() {
-            const settings = {
-                operations: gameState.operations,
-                minNum: parseInt(document.getElementById('minNumber').value),
-                maxNum: parseInt(document.getElementById('maxNumber').value),
-                mode: document.querySelector('input[name="practiceMode"]:checked').value,
-                duration: parseInt(document.getElementById('practiceMinutes').value),
-                quantity: parseInt(document.getElementById('practiceQuantity').value),
-                soundsEnabled: document.getElementById('enableSounds').checked,
-                autoEnter: document.getElementById('autoEnter').checked,
-                timeLimitEnabled: document.getElementById('timeLimitEnabled').checked,
-                timeLimitSeconds: parseInt(document.getElementById('timeLimitSeconds').value),
-                mistakeThresholdEnabled: document.getElementById('mistakeThresholdEnabled').checked,
-                mistakeThresholdAction: document.getElementById('mistakeThresholdAction').value,
-                mistakeThresholdCount: parseInt(document.getElementById('mistakeThresholdCount').value),
-                hideQuestionTimer: document.getElementById('hideQuestionTimer').checked,
-                
-                // Save new meme break settings
-                memeBreakEnabled: document.getElementById('memeBreakEnabled').checked,
-                memeBreakInterval: parseInt(document.getElementById('memeBreakInterval').value),
-                memeBreakDuration: parseInt(document.getElementById('memeBreakDuration').value),
-                memeBreakSlideshowSpeed: parseInt(document.getElementById('memeBreakSlideshowSpeed').value) // New: Save slideshow speed
-            };
-            localStorage.setItem('mathTrainerSettings', JSON.stringify(settings));
-            // Removed: alert('Settings saved!');
-        }
-
-        function loadSettings() {
-            const savedSettings = localStorage.getItem('mathTrainerSettings');
-            if (savedSettings) {
-                const settings = JSON.parse(savedSettings);
-                // Apply loaded settings to gameState
-                gameState.operations = settings.operations || ['addition'];
-                gameState.minNum = settings.minNum !== undefined ? settings.minNum : 1;
-                gameState.maxNum = settings.maxNum !== undefined ? settings.maxNum : 20;
-                gameState.mode = settings.mode || 'timed';
-                gameState.duration = settings.duration !== undefined ? settings.duration : 5;
-                gameState.quantity = settings.quantity !== undefined ? settings.quantity : 20;
-                gameState.soundsEnabled = settings.soundsEnabled !== undefined ? settings.soundsEnabled : true;
-                gameState.autoEnter = settings.autoEnter !== undefined ? settings.autoEnter : true;
-                gameState.timeLimitEnabled = settings.timeLimitEnabled !== undefined ? settings.timeLimitEnabled : false;
-                gameState.timeLimitSeconds = settings.timeLimitSeconds !== undefined ? settings.timeLimitSeconds : 5;
-                gameState.mistakeThresholdEnabled = settings.mistakeThresholdEnabled !== undefined ? settings.mistakeThresholdEnabled : false;
-                gameState.mistakeThresholdAction = settings.mistakeThresholdAction || 'end';
-                gameState.mistakeThresholdCount = settings.mistakeThresholdCount !== undefined ? settings.mistakeThresholdCount : 3;
-                gameState.hideQuestionTimer = settings.hideQuestionTimer !== undefined ? settings.hideQuestionTimer : false; // Load new preference
-                
-                // Load new meme break settings
-                gameState.memeBreakEnabled = settings.memeBreakEnabled !== undefined ? settings.memeBreakEnabled : false;
-                gameState.memeBreakInterval = settings.memeBreakInterval !== undefined ? settings.memeBreakInterval : 10;
-                gameState.memeBreakDuration = settings.memeBreakDuration !== undefined ? settings.memeBreakDuration : 5;
-                gameState.memeBreakSlideshowSpeed = settings.memeBreakSlideshowSpeed !== undefined ? settings.memeBreakSlideshowSpeed : 2; // New: Load slideshow speed
-
-                // Update UI elements based on loaded settings
-                document.getElementById('minNumber').value = gameState.minNum;
-                document.getElementById('maxNumber').value = gameState.maxNum;
-                document.getElementById('practiceMinutes').value = gameState.duration;
-                document.getElementById('practiceQuantity').value = gameState.quantity;
-                document.getElementById('enableSounds').checked = gameState.soundsEnabled;
-                document.getElementById('autoEnter').checked = gameState.autoEnter;
-                document.getElementById('timeLimitEnabled').checked = gameState.timeLimitEnabled;
-                document.getElementById('timeLimitSeconds').value = gameState.timeLimitSeconds;
-                document.getElementById('mistakeThresholdEnabled').checked = gameState.mistakeThresholdEnabled;
-                document.getElementById('mistakeThresholdAction').value = gameState.mistakeThresholdAction;
-                document.getElementById('mistakeThresholdCount').value = gameState.mistakeThresholdCount;
-                document.getElementById('hideQuestionTimer').checked = gameState.hideQuestionTimer; // Update new preference
-                
-                // Update new meme break UI
-                document.getElementById('memeBreakEnabled').checked = gameState.memeBreakEnabled;
-                document.getElementById('memeBreakInterval').value = gameState.memeBreakInterval;
-                document.getElementById('memeBreakDuration').value = gameState.memeBreakDuration;
-                document.getElementById('memeBreakSlideshowSpeed').value = gameState.memeBreakSlideshowSpeed; // New: Update slideshow speed UI
-
-                if (gameState.mode === 'timed') {
-                    document.getElementById('timedMode').checked = true;
-                } else {
-                    document.getElementById('quantityMode').checked = true;
-                }
-
-                // Update operation buttons visual state
-                const allOps = ['addition', 'subtraction', 'multiplication', 'division'];
-                allOps.forEach(op => {
-                    const btn = document.querySelector(`[data-operation="${op}"]`);
-                    if (gameState.operations.includes(op)) {
-                        btn.classList.add('selected');
-                    } else {
-                        btn.classList.remove('selected');
-                    }
-                });
-                const mixedBtn = document.querySelector('[data-operation="mixed"]');
-                if (allOps.every(op => gameState.operations.includes(op)) && gameState.operations.length === allOps.length) {
-                    mixedBtn.classList.add('selected');
-                } else {
-                    mixedBtn.classList.remove('selected');
-                }
-            }
-        }
-
-        function startCountdown() {
-            const countdownDisplay = document.getElementById('countdownDisplay');
-            const problemDisplay = document.getElementById('problemDisplay');
-            const answerInput = document.getElementById('answerInput');
-            const submitBtn = document.getElementById('submitBtn');
-            const questionTimerDisplay = document.getElementById('questionTimer'); // Get question timer element
-            const otherStats = document.querySelectorAll('#practiceScreen > *:not(#countdownDisplay):not(#submitBtn):not(#answerInput):not(#problemDisplay):not(#questionTimer)'); // Exclude question timer from initial hide
-
-            let count = 3;
-
-            // Hide everything except the countdown
-            problemDisplay.style.display = 'none';
-            answerInput.style.display = 'none';
-            submitBtn.style.display = 'none';
-            questionTimerDisplay.style.display = 'none'; // Explicitly hide question timer during countdown
-            otherStats.forEach(el => el.style.display = 'none'); // Hide other stats/timers during countdown
-
-            countdownDisplay.style.display = 'block';
-            countdownDisplay.textContent = count;
-
-            const countdownInterval = setInterval(() => {
-                count--;
-                if (count > 0) {
-                    countdownDisplay.textContent = count;
-                } else if (count === 0) {
-                    countdownDisplay.textContent = 'Go!';
-                } else {
-                    clearInterval(countdownInterval);
-                    countdownDisplay.style.display = 'none'; // Hide countdown
-                    
-                    // Show problem elements
-                    problemDisplay.style.display = 'block';
-                    answerInput.style.display = 'block';
-                    submitBtn.style.display = 'inline-block'; // Buttons use inline-block
-                    otherStats.forEach(el => el.style.display = ''); // Restore display for other stats/timers
-
-                    // Initialize practice elements and start problem generation
-                    updateStats();
-                    updateOperationStats();
-                    updateProgress();
-                    generateProblem(); // This will handle showing/hiding question timer based on preference
-                }
-            }, 1000);
-        }
-
-        function startPractice() {
-            // Get settings (ensure UI values are synced to gameState before saving)
-            gameState.minNum = parseInt(document.getElementById('minNumber').value);
-            gameState.maxNum = parseInt(document.getElementById('maxNumber').value);
-            gameState.mode = document.querySelector('input[name="practiceMode"]:checked').value;
-            gameState.duration = parseInt(document.getElementById('practiceMinutes').value);
-            gameState.quantity = parseInt(document.getElementById('practiceQuantity').value);
-            gameState.soundsEnabled = document.getElementById('enableSounds').checked;
-            gameState.autoEnter = document.getElementById('autoEnter').checked;
-            gameState.timeLimitEnabled = document.getElementById('timeLimitEnabled').checked;
-            gameState.timeLimitSeconds = parseInt(document.getElementById('timeLimitSeconds').value);
-            gameState.mistakeThresholdEnabled = document.getElementById('mistakeThresholdEnabled').checked; // Read new preference
-            gameState.mistakeThresholdAction = document.getElementById('mistakeThresholdAction').value;     // Read new preference
-            gameState.mistakeThresholdCount = parseInt(document.getElementById('mistakeThresholdCount').value); // Read new preference
-            gameState.hideQuestionTimer = document.getElementById('hideQuestionTimer').checked; // Read new preference
-            
-            // Read new meme break settings
-            gameState.memeBreakEnabled = document.getElementById('memeBreakEnabled').checked;
-            gameState.memeBreakInterval = parseInt(document.getElementById('memeBreakInterval').value);
-            gameState.memeBreakDuration = parseInt(document.getElementById('memeBreakDuration').value);
-            gameState.memeBreakSlideshowSpeed = parseInt(document.getElementById('memeBreakSlideshowSpeed').value); // New: Read slideshow speed
-
-
-            // Validate settings
-            if (gameState.minNum > gameState.maxNum) {
-                alert('Minimum number cannot be greater than maximum number!');
-                return;
-            }
-            if (gameState.operations.length === 0) {
-                alert('Please select at least one operation!');
-                return;
-            }
-            if (gameState.timeLimitEnabled && (isNaN(gameState.timeLimitSeconds) || gameState.timeLimitSeconds <= 0)) {
-                alert('Please enter a valid time limit in seconds (must be a positive number).');
-                return;
-            }
-            if (gameState.mistakeThresholdEnabled && (isNaN(gameState.mistakeThresholdCount) || gameState.mistakeThresholdCount <= 0)) {
-                alert('Please enter a valid mistake threshold (must be a positive number).');
-                return;
-            }
-            if (gameState.memeBreakEnabled && (isNaN(gameState.memeBreakInterval) || gameState.memeBreakInterval <= 0 || 
-                                              isNaN(gameState.memeBreakDuration) || gameState.memeBreakDuration <= 0 ||
-                                              isNaN(gameState.memeBreakSlideshowSpeed) || gameState.memeBreakSlideshowSpeed <= 0)) {
-                alert('Please enter valid positive numbers for Meme Break problems, duration, and slideshow speed.');
-                return;
-            }
-            
-            // Save settings before starting practice
-            saveSettings();
-
-            // Reset game state for a new session
-            gameState.correct = 0;
-            gameState.incorrect = 0;
-            gameState.problemCount = 0;
-            gameState.startTime = Date.now();
-            gameState.problemTimes = []; // Reset problem times
-            gameState.missedProblems = []; // Reset missed problems
-            gameState.operationStats = {
-                addition: { correct: 0, total: 0 },
-                subtraction: { correct: 0, total: 0 },
-                multiplication: { correct: 0, total: 0 },
-                division: { correct: 0, total: 0 }
-            };
-            // Reset meme break counter for new session
-            gameState.problemsUntilMemeBreak = gameState.memeBreakEnabled ? gameState.memeBreakInterval : 0;
-
-
-            // Set up timer/progress bar display based on mode
-            if (gameState.mode === 'timed') {
-                gameState.timeLeft = gameState.duration * 60; // Convert minutes to seconds
-                document.getElementById('timerDisplay').style.display = 'block';
-                document.getElementById('progressContainer').style.display = 'none';
-                if (gameState.timer) clearInterval(gameState.timer);
-                gameState.timer = setInterval(updateTimerDisplay, 1000);
-            } else { // quantity mode
-                document.getElementById('timerDisplay').style.display = 'none';
-                document.getElementById('progressContainer').style.display = 'block';
-                if (gameState.timer) clearInterval(gameState.timer); // Clear if previously timed
-                gameState.timer = null; // No main timer for quantity mode
-            }
-            
-            // Reset score displays and input
-            document.getElementById('correctScore').textContent = '0';
-            document.getElementById('incorrectScore').textContent = '0';
-            document.getElementById('answerInput').value = '';
-            
-            showScreen('practiceScreen');
-            startCountdown(); // Start the countdown before generating the first problem
-            
-            // Hide floating button when starting practice
-            document.getElementById('showNoticeFloatingBtn').style.display = 'none';
-        }
-
-        function submitAnswer(forceIncorrectDueToTime = false) {
-            const answerInput = document.getElementById('answerInput');
-            const userAnswer = parseInt(answerInput.value);
-            
-            // Record time for the just-completed problem
-            const problemEndTime = Date.now();
-            let timeTaken = 0;
-            if (gameState.questionStartTime) { // Only calculate if timer was running
-                timeTaken = (problemEndTime - gameState.questionStartTime) / 1000; // in seconds
-            }
-            
-            // Clear question timer immediately upon submission
-            if (gameState.questionTimer) {
-                clearInterval(gameState.questionTimer);
-                document.getElementById('questionTimer').textContent = '0.0s';
-            }
-            // Ensure question timer is hidden if preference is set
-            if (gameState.hideQuestionTimer) {
-                document.getElementById('questionTimer').style.display = 'none';
-            }
-
-
-            // Check for time limit before processing answer
-            let isCorrect = false;
-            let timeLimitExceeded = gameState.timeLimitEnabled && timeTaken > gameState.timeLimitSeconds;
-
-            if (forceIncorrectDueToTime || isNaN(userAnswer) || timeLimitExceeded || userAnswer !== gameState.currentProblem.answer) {
-                gameState.incorrect++;
-                answerInput.classList.add('incorrect-answer');
-                playChime(false);
-                
-                let reason = '';
-                if (forceIncorrectDueToTime) {
-                    reason = ` (Time limit exceeded: ${timeTaken.toFixed(1)}s)`;
-                } else if (isNaN(userAnswer)) {
-                    reason = ' (No answer/Invalid input)';
-                } else if (timeLimitExceeded) {
-                    reason = ` (Time limit exceeded: ${timeTaken.toFixed(1)}s)`;
-                }
-                
-                // Store missed problem details
-                gameState.missedProblems.push({
-                    problem: `${gameState.currentProblem.num1} ${gameState.currentProblem.symbol} ${gameState.currentProblem.num2} = ?`,
-                    correctAnswer: gameState.currentProblem.answer,
-                    userAnswer: isNaN(userAnswer) ? 'N/A' : userAnswer,
-                    reason: reason // Add reason for missing
-                });
-
-                // Check mistake threshold
-                if (gameState.mistakeThresholdEnabled && gameState.incorrect >= gameState.mistakeThresholdCount) {
-                    if (gameState.mistakeThresholdAction === 'end') {
-                        endPractice();
-                        return; // Stop further processing
-                    } else if (gameState.mistakeThresholdAction === 'restart') {
-                        startPractice(); // Restart the session
-                        return; // Stop further processing
-                    }
-                }
-
-            } else {
-                gameState.correct++;
-                answerInput.classList.add('correct-answer');
-                playChime(true);
-                isCorrect = true;
-            }
-
-            // Only add to problemTimes if the problem was actually attempted (not just timed out before input)
-            // Or if it was marked incorrect due to time limit
-            if ((!isNaN(userAnswer) || timeLimitExceeded) && gameState.currentProblem) { 
-                gameState.problemTimes.push(timeTaken);
-                gameState.problemCount++;
-                gameState.operationStats[gameState.currentProblem.operation].total++;
-                if (isCorrect) {
-                     gameState.operationStats[gameState.currentProblem.operation].correct++;
-                }
-            }
-
-
-            updateScoreNumbers(isCorrect); // This depends on the final isCorrect state
-            updateStats();
-            updateOperationStats();
-            updateProgress();
-            
-            // Immediately clear input field
-            answerInput.value = ''; 
-            
-            // Check if practice should end
-            if (gameState.mode === 'quantity' && gameState.problemCount >= gameState.quantity) {
-                setTimeout(endPractice, 100); // Small delay to see feedback before ending
-            } else {
-                // Check for meme break
-                if (gameState.memeBreakEnabled) {
-                    gameState.problemsUntilMemeBreak--;
-                    if (gameState.problemsUntilMemeBreak <= 0) {
-                        showMemeBreakScreen();
-                        gameState.problemsUntilMemeBreak = gameState.memeBreakInterval; // Reset counter
-                        return; // Stop further processing here
-                    }
-                }
-
-                setTimeout(() => {
-                    answerInput.classList.remove('correct-answer', 'incorrect-answer'); // Remove styling after delay
-                    generateProblem(); // Generate new problem after a short delay
-                    answerInput.focus(); // Ensure input field is re-focused
-                }, 100); // 100ms delay for both styling removal and problem generation
-            }
-        }
-
-        function endPractice() {
-            // Stop timers
-            if (gameState.timer) clearInterval(gameState.timer);
-            if (gameState.questionTimer) clearInterval(gameState.questionTimer);
-            
-            const endTime = Date.now();
-            const totalElapsedTime = Math.floor((endTime - gameState.startTime) / 1000);
-            const minutes = Math.floor(totalElapsedTime / 60);
-            const seconds = totalElapsedTime % 60;
-
-            // Calculate average time per problem
-            const totalProblemsAttempted = gameState.problemTimes.length;
-            let averageTime = 0;
-            if (totalProblemsAttempted > 0) {
-                const totalTimeSum = gameState.problemTimes.reduce((sum, time) => sum + time, 0);
-                averageTime = totalTimeSum / totalProblemsAttempted;
-            }
-
-            // Populate results screen
-            document.getElementById('finalCorrect').textContent = gameState.correct;
-            document.getElementById('finalIncorrect').textContent = gameState.incorrect;
-            
-            const totalProblems = gameState.correct + gameState.incorrect;
-            const finalAccuracy = totalProblems > 0 ? Math.round((gameState.correct / totalProblems) * 100) : 0;
-            document.getElementById('finalAccuracy').textContent = finalAccuracy + '%';
-            document.getElementById('finalTime').textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            document.getElementById('averageTime').textContent = `${averageTime.toFixed(1)}s`;
-
-            // Populate final operation stats if mixed mode was used
-            const allOps = ['addition', 'subtraction', 'multiplication', 'division'];
-            let shouldShowFinalOperationStats = false;
-            // Show operation stats if more than one type of operation was selected for practice
-            if (gameState.operations.length > 1) {
-                shouldShowFinalOperationStats = true;
-            }
-            if (allOps.every(op => gameState.operations.includes(op)) && gameState.operations.length === allOps.length) {
-                shouldShowFinalOperationStats = true;
-            }
-            
-
-            if (shouldShowFinalOperationStats) {
-                document.getElementById('finalOperationStats').style.display = 'flex';
-                allOps.forEach(op => {
-                    const finalStatElement = document.getElementById(`final${op.charAt(0).toUpperCase() + op.slice(1)}Stat`);
-                    if (finalStatElement) { // Check if element exists
-                        const stats = gameState.operationStats[op];
-                        const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-                        finalStatElement.textContent = `${stats.correct}/${stats.total} (${accuracy}%)`;
-                    }
-                });
-            } else {
-                document.getElementById('finalOperationStats').style.display = 'none';
-            }
-
-            // Show/hide "View Missed Problems" button
-            const viewMissedBtn = document.getElementById('viewMissedProblemsBtn');
-            if (gameState.missedProblems.length > 0) {
-                viewMissedBtn.style.display = 'inline-block';
-            } else {
-                viewMissedBtn.style.display = 'none';
-            }
-
-            showScreen('resultsScreen');
-            // Hide floating button when practice ends
-            document.getElementById('showNoticeFloatingBtn').style.display = 'none';
-        }
-
-        function showResults() {
-            showScreen('resultsScreen');
-            document.getElementById('showNoticeFloatingBtn').style.display = 'none';
-        }
-
-        function showMissedProblems() {
-            const missedProblemsList = document.getElementById('missedProblemsList');
-            missedProblemsList.innerHTML = ''; // Clear previous list
-
-            if (gameState.missedProblems.length === 0) {
-                missedProblemsList.innerHTML = '<p style="text-align: center; color: #b0b0b0;">Great job! You didn\'t miss any problems.</p>';
-            } else {
-                gameState.missedProblems.forEach(problem => {
-                    const listItem = document.createElement('li');
-                    listItem.classList.add('missed-problem-item');
-                    listItem.innerHTML = `
-                        <span class="problem-text">${problem.problem}</span>
-                        <span class="correct-answer">Correct: ${problem.correctAnswer}</span>
-                        ${problem.userAnswer ? `<span style="color: #e74c3c; margin-left: 10px;">Your Answer: ${problem.userAnswer}</span>` : ''}
-                        ${problem.reason ? `<span style="color: #b0b0b0; margin-left: 10px; font-size: 0.9em;">${problem.reason}</span>` : ''}
-                    `;
-                    missedProblemsList.appendChild(listItem);
-                });
-            }
-
-            showScreen('missedProblemsScreen');
-            document.getElementById('showNoticeFloatingBtn').style.display = 'none';
-        }
-
-        function exportSessionProgress() {
-            let exportText = `Mental Math Trainer Pro - Session Progress\n\n`;
-            exportText += `Date: ${new Date().toLocaleString()}\n`;
-            exportText += `----------------------------------------\n`;
-            exportText += `Overall Performance:\n`;
-            exportText += `  Correct Answers: ${gameState.correct}\n`;
-            exportText += `  Incorrect Answers: ${gameState.incorrect}\n`;
-            
-            const totalProblems = gameState.correct + gameState.incorrect;
-            const finalAccuracy = totalProblems > 0 ? Math.round((gameState.correct / totalProblems) * 100) : 0;
-            exportText += `  Final Accuracy: ${finalAccuracy}%\n`;
-
-            const totalElapsedTime = Math.floor((Date.now() - gameState.startTime) / 1000); // Recalculate total time if user ends practice mid-way
-            const minutes = Math.floor(totalElapsedTime / 60);
-            const seconds = totalElapsedTime % 60;
-            exportText += `  Time Elapsed: ${minutes}:${seconds.toString().padStart(2, '0')}\n`;
-
-            const totalProblemsAttempted = gameState.problemTimes.length;
-            let averageTime = 0;
-            if (totalProblemsAttempted > 0) {
-                const totalTimeSum = gameState.problemTimes.reduce((sum, time) => sum + time, 0);
-                averageTime = totalTimeSum / totalProblemsAttempted;
-            }
-            exportText += `  Average Time per Problem: ${averageTime.toFixed(1)}s\n`;
-
-            exportText += `\nOperation Breakdown:\n`;
-            const allOps = ['addition', 'subtraction', 'multiplication', 'division'];
-            allOps.forEach(op => {
-                const stats = gameState.operationStats[op];
-                const accuracy = stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0;
-                exportText += `  ${op.charAt(0).toUpperCase() + op.slice(1)}: ${stats.correct}/${stats.total} (${accuracy}%)\n`;
-            });
-
-            if (gameState.missedProblems.length > 0) {
-                exportText += `\nMissed Problems:\n`;
-                gameState.missedProblems.forEach((problem, index) => {
-                    exportText += `  ${index + 1}. ${problem.problem} Correct: ${problem.correctAnswer}`;
-                    if (problem.userAnswer && problem.userAnswer !== 'N/A') {
-                        exportText += ` User Answer: ${problem.userAnswer}`;
-                    }
-                    if (problem.reason) {
-                        exportText += ` Reason: ${problem.reason.trim()}`;
-                    }
-                    exportText += `\n`;
-                });
-            } else {
-                exportText += `\nNo problems were missed in this session. Great job!\n`;
-            }
-
-            // Create a Blob from the text and create a download link
-            const blob = new Blob([exportText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `mental_math_progress_${new Date().toISOString().slice(0, 10)}.txt`; // Filename with date
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url); // Clean up the object URL
-        }
-
-        // New Meme Break Functions
-        function loadMemeImages() {
-            // Preload images to prevent flickering
-            gameState.memeImages.forEach(src => {
-                const img = new Image();
-                img.src = src;
-            });
-            // Shuffle memes if you want them in random order
-            for (let i = gameState.memeImages.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [gameState.memeImages[i], gameState.memeImages[j]] = [gameState.memeImages[j], gameState.memeImages[i]];
-            }
-        }
-
-        function showMemeBreakScreen() {
-            showScreen('memeBreakScreen');
-            document.getElementById('answerInput').disabled = true; // Disable input during meme break
-            document.getElementById('submitBtn').disabled = true; // Disable submit button
-
-            if (gameState.timer) clearInterval(gameState.timer); // Pause main timer
-            if (gameState.questionTimer) clearInterval(gameState.questionTimer); // Pause question timer
-
-            const memeDisplay = document.getElementById('memeDisplay');
-            const memeTimerDisplay = document.getElementById('memeTimer');
-            let timeLeft = gameState.memeBreakDuration;
-            
-            gameState.currentMemeIndex = 0; // Start from the first meme
-            memeDisplay.src = gameState.memeImages[gameState.currentMemeIndex];
-            memeDisplay.style.opacity = 1; // Ensure it's visible
-
-            memeTimerDisplay.textContent = `${timeLeft}s`;
-
-            // Clear any existing slideshow interval before starting a new one
-            if (gameState.memeSlideshowInterval) {
-                clearInterval(gameState.memeSlideshowInterval);
-            }
-
-            gameState.memeSlideshowInterval = setInterval(() => {
-                gameState.currentMemeIndex = (gameState.currentMemeIndex + 1) % gameState.memeImages.length;
-                memeDisplay.style.opacity = 0; // Fade out current meme
-                setTimeout(() => {
-                    memeDisplay.src = gameState.memeImages[gameState.currentMemeIndex];
-                    memeDisplay.style.opacity = 1; // Fade in next meme
-                }, 500); // Match CSS transition duration for fade
-
-            }, gameState.memeBreakSlideshowSpeed * 1000); // Use the new slideshow speed
-
-            gameState.memeBreakTimer = setInterval(() => {
-                timeLeft--;
-                memeTimerDisplay.textContent = `${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    endMemeSlideshow();
-                }
-            }, 1000);
-        }
-
-        function endMemeSlideshow() {
-            clearInterval(gameState.memeBreakTimer);
-            clearInterval(gameState.memeSlideshowInterval); // Clear the slideshow interval
-            
-            document.getElementById('answerInput').disabled = false; // Re-enable input
-            document.getElementById('submitBtn').disabled = false; // Re-enable submit button
-
-            showScreen('practiceScreen'); // Return to practice screen
-            generateProblem(); // Generate next problem
-            
-            // Resume main timer if in timed mode
-            if (gameState.mode === 'timed') {
-                gameState.timer = setInterval(updateTimerDisplay, 1000);
-            }
-        }
-
-
-        // Auto-enter functionality
-        document.getElementById('answerInput').addEventListener('input', function() {
-            if (gameState.autoEnter && gameState.currentProblem) {
-                const userAnswer = this.value;
-                const correctAnswer = String(gameState.currentProblem.answer);
-                
-                // If the user has typed the full correct length and it's a valid number
-                // Check if userAnswer is empty string or only contains '-'
-                if (userAnswer === '' || userAnswer === '-') {
-                    return; // Do not auto-submit if input is empty or just '-'
-                }
-                
-                if (userAnswer.length === correctAnswer.length && !isNaN(parseInt(userAnswer))) {
-                    submitAnswer();
-                }
-            }
-        });
-
-        // Footer Notice Logic
-        function toggleFooterNotice() {
-            const footerNotice = document.getElementById('footerNotice');
-            const showNoticeFloatingBtn = document.getElementById('showNoticeFloatingBtn');
-            const isHidden = footerNotice.style.display === 'none';
-
-            if (isHidden) {
-                // Show the notice
-                footerNotice.style.display = 'flex';
-                showNoticeFloatingBtn.style.display = 'none';
-                localStorage.setItem('footerNoticeHidden', 'false');
-            } else {
-                // Hide the notice
-                footerNotice.style.display = 'none';
-                showNoticeFloatingBtn.style.display = 'flex'; // Show floating button
-                localStorage.setItem('footerNoticeHidden', 'true');
-            }
-        }
-
-        function applyFooterNoticeState() {
-            const footerNotice = document.getElementById('footerNotice');
-            const showNoticeFloatingBtn = document.getElementById('showNoticeFloatingBtn');
-            const isHidden = localStorage.getItem('footerNoticeHidden');
-            const currentScreen = document.querySelector('.screen.active');
-
-            if (isHidden === 'true') {
-                footerNotice.style.display = 'none';
-                // Only show floating button if on the start screen
-                if (currentScreen && currentScreen.id === 'startScreen') {
-                    showNoticeFloatingBtn.style.display = 'flex';
-                } else {
-                    showNoticeFloatingBtn.style.display = 'none';
-                }
-            } else {
-                footerNotice.style.display = 'flex';
-                showNoticeFloatingBtn.style.display = 'none';
-            }
-        }
-
-        // Initialize the app on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSettings(); // Load settings when the page loads
-            loadMemeImages(); // Preload meme images
-            showStart(); // This will call applyFooterNoticeState
-            
-            // Add event listener for the hide notice button (inside the notice)
-            document.getElementById('hideNoticeBtn').addEventListener('click', toggleFooterNotice);
-            // The floating button already has an inline onclick for toggleFooterNotice
-        });
-    </script>
+    <!-- Custom Practice Modal -->
+    <div class="modal-overlay" id="customModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Custom Practice Session</h3>
+                <button class="modal-close" onclick="hideModal('customModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h4 class="settings-title">Session Configuration</h4>
+                    <div class="setting-item">
+                        <span class="setting-label">Number of Problems</span>
+                        <span class="setting-control">25</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Time Limit</span>
+                        <span class="setting-control">5 minutes</span>
+                    </div>
+                    <div class="setting-item">
+                        <span class="setting-label">Operations</span>
+                        <span class="setting-control">All Enabled</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Modal -->
+    <div class="modal-overlay" id="trainingModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="trainingModalTitle">Mental Math Training</h3>
+                <button class="modal-close" onclick="requestEndSession()">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- New Countdown Display -->
+                <div id="countdownDisplay"></div>
+
+                <div id="trainingProgress">
+                    <div id="trainingProgressBar"></div>
+                </div>
+                <!-- Original timerDisplay is for timed practice countdown -->
+                <div id="timerDisplay" style="display: none;">Time Left: 00:00</div>
+                <!-- New stopwatch display -->
+                <div id="stopwatchDisplay">0.0s</div> 
+                <div id="problemCountDisplay">
+                    Problem: <span id="currentProblemNumber">0</span> / <span id="totalProblems">0</span>
+                    <span style="margin-left: 1rem;">Correct: <span id="correctScore" class="score-number correct">0</span></span>
+                    <span>Incorrect: <span id="incorrectScore" class="score-number incorrect">0</span></span>
+                </div>
+                <div id="problemDisplay"></div>
+                <!-- Container for input and repeat button -->
+                <div class="answer-input-container">
+                    <input type="number" id="answerInput" placeholder="Your Answer" autofocus>
+                    <button id="repeatProblemBtn" class="repeat-problem-btn" title="Repeat Problem">
+                        <div class="speaker"></div>
+                    </button>
+                </div>
+                <div id="feedbackMessage"></div>
+                <div id="trainingControls">
+                    <button id="endSessionBtn">End Session</button>
+                    <div id="endSessionConfirmation">
+                        <p id="confirmationMessage">Are you sure you want to end this session? If you end it now, it will not be saved in your recent performance or counted toward your progress on the dashboard.</p>
+                        <div id="confirmationButtons">
+                            <button id="confirmEndBtn">Yes, End Session</button>
+                            <button id="cancelEndBtn">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Modal -->
+    <div class="modal-overlay" id="summaryModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="summaryModalTitle">Practice Complete! 🎉</h3>
+                <button class="modal-close" onclick="hideModal('summaryModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-item">
+                    <span class="summary-label">Correct Answers</span>
+                    <span class="summary-value" id="summaryCorrect">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Incorrect Answers</span>
+                    <span class="summary-value" id="summaryIncorrect">0</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Final Accuracy</span>
+                    <span class="summary-value" id="summaryAccuracy">0%</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Time Elapsed</span>
+                    <span class="summary-value" id="summaryTimeElapsed">00:00</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Avg. Time/Problem</span>
+                    <span class="summary-value" id="summaryAvgTime">0.0s</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to external JavaScript file -->
+    <script src="script.js"></script>
 </body>
 </html>
