@@ -1,6 +1,6 @@
 # 🧮 Mental Math Trainer Pro
 
-*A free, offline, customizable mental math trainer designed for speed, accuracy, and user control — built especially for users who want a clean and focused tool.*
+*A free, offline, customizable mental math trainer designed for speed, accuracy, and user control — built for users who want a clean and focused tool.*
 
 ---
 
